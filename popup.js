@@ -10,10 +10,21 @@
 //   };
 
 function test() {
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    var plarform = $('#platform');
-    platform.innerText = "Chrome tourne sur " + platformInfo.os;
+  var list_episode = $("#list_episode");
+
+  chrome.storage.sync.get(['items_adn'],function(result){
+    var items_adn = result.items_adn;
+    for(var i=0;i<items_adn.length;i++){
+      list_episode.append($('<div/>').text(items_adn[i].title));
+    }
   })
 }
 
 test();
+
+chrome.storage.onChanged.addListener(function(changes,areaName){
+  console.log("OnChanged Listener");
+  if(changes.items_adn){
+    console.log("Items ADN modified");
+  }
+})
