@@ -12,19 +12,12 @@
 function test() {
   var list_episode = $("#list_episode");
 
-  chrome.storage.sync.get(['items_adn'],function(result){
-    var items_adn = result.items_adn;
-    for(var i=0;i<items_adn.length;i++){
-      list_episode.append($('<div/>').text(items_adn[i].title));
-    }
+  chrome.storage.sync.get(['to_watch_list'],function(result){
+    var to_watch_list = result.to_watch_list;
+    to_watch_list.forEach(function(elem){
+        list_episode.append($('<div/>').text(elem.title));
+    });
   })
 }
 
 test();
-
-chrome.storage.onChanged.addListener(function(changes,areaName){
-  console.log("OnChanged Listener");
-  if(changes.items_adn){
-    console.log("Items ADN modified");
-  }
-})
