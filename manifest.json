@@ -2,7 +2,7 @@
   "name": "Getting Started Example",
   "version": "1.0",
   "description": "Build an Extension!",
-  "permissions": ["notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","http://www.crunchyroll.com/"],
+  "permissions": ["downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","http://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {
     "scripts": ["jquery-3.3.1.min.js","background.js"],
     "persistent": false

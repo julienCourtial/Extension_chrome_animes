@@ -1,24 +1,18 @@
-// changeColor.onclick = function(element) {
-//     let color = element.target.value;
-//     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-//       chrome.tabs.executeScript(
-//           tabs[0].id,
-//           {code: 'document.body.style.backgroundColor = "' + color + '";'});
-//     });
-//   };
-
-function test() {
+function display_to_watch_list() {
   var list_episode = $("#list_episode");
 
   chrome.storage.sync.get(['to_watch_list'], function(result) {
     var to_watch_list = result.to_watch_list;
     to_watch_list.forEach(function(elem) {
       var elem_display = $('<div/>').hover(function() {
-        $(this).css("background-color", "#e6e6e6");
+        $(this).css("background-color", "#37474f");
       }, function() {
-        $(this).css("background-color", "white");
+        $(this).css("background-color", "#263238");
       });
       elem_display[0].classList.add("row");
+      elem_display[0].style.borderColor = "#37474f";
+      elem_display[0].style.borderStyle = "solid";
+      elem_display[0].style.borderRadius = "5px";
       var col1 = $("<div/>)");
       col1[0].classList.add("col");
       col1[0].classList.add("s6");
@@ -51,4 +45,4 @@ function test() {
   });
 }
 
-test();
+display_to_watch_list();
