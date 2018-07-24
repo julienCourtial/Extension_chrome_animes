@@ -3,6 +3,7 @@ let adn_list;
 let crunchyroll_list;
 let wakanim_list;
 let to_watch_list = [];
+let running;
 
 //NOT WORKING
 function set_watching_anime_list_my_anime_list() {
@@ -116,13 +117,29 @@ function set_wakanim_list() {
               if (elem2.nodeName.toLowerCase() == "div" && elem2.classList.value == "slider js-slider js-slider-lastEp") {
                 var list_last_ep = elem2.children[0].children[0].children[0].children;
                 for (var i = 0; i < list_last_ep.length; i++) {
+                  var num_ep;
+                  var saison;
+                  var series;
+                  var image;
+                  var link;
+                  for (var j = 0; j < list_last_ep[i].children.length; j++) {
+                    if (list_last_ep[i].children[j].classList[0] == "slider_item_image") {
+                      num_ep = list_last_ep[i].children[j].children[1].textContent.trim();
+                      link = list_last_ep[i].children[j].children[1].getAttribute("href");
+                      image = list_last_ep[i].children[j].children[0].children[0].getAttribute("src");
+                    } else if (list_last_ep[i].children[j].classList[0] == "slider_item_description") {
+                      saison = list_last_ep[i].children[j].children[0].children[2].textContent;
+                      series = list_last_ep[i].children[j].children[0].children[0].textContent;
+                    }
+                  };
                   var item = {
-                    title: list_last_ep[i].children[3].children[0].children[0].textContent + " " + list_last_ep[i].children[3].children[0].children[2].textContent + " Épisode " + list_last_ep[i].children[1].children[1].textContent.trim(),
-                    link: "https://www.wakanim.tv" + list_last_ep[i].children[0].getAttribute("href"),
-                    img: "https:" + list_last_ep[i].children[1].children[0].children[0].getAttribute("src"),
+                    title: series + " " + saison + " Épisode " + num_ep,
+                    link: "https://www.wakanim.tv" + link,
+                    img: "https:" + image,
                     from: "Wakanim"
                   };
                   items.push(item);
+
                 }
               }
             });
@@ -132,7 +149,6 @@ function set_wakanim_list() {
       }
 
     });
-    console.log(items);
     wakanim_list = items;
 
   });
@@ -147,7 +163,6 @@ function set_to_watch_list_adn(item, title_alt) {
     if (title_alt)
       titles = titles.concat(" /", title_alt.toLowerCase());
     adn_list.forEach(function(elem) {
-      // titles.split(" / ").forEach(function(title_compare) {
       if (titles.includes(elem.title.split(" Épisode")[0].toLowerCase())) {
 
         var add_to_list = true;
@@ -173,10 +188,6 @@ function set_to_watch_list_adn(item, title_alt) {
           }
         });
       }
-
-
-
-      // });
     });
   }
 }
@@ -235,7 +246,6 @@ function set_to_watch_list_wakanim(item, title_alt) {
       titles = titles.concat(" /", title_alt.toLowerCase());
     wakanim_list.forEach(function(elem) {
       if (titles.includes(elem.title.split(" Saison")[0].toLowerCase())) {
-        console.log(titles);
         var add_to_list = true;
         to_watch_list.forEach(function(to_watch) {
           if (to_watch.title == elem.title)
@@ -326,46 +336,64 @@ function set_to_watch_list() {
 }
 
 
-
-chrome.runtime.onInstalled.addListener(function() {
-  console.log("OnInstalled");
-  chrome.storage.sync.clear();
+function refresh() {
+  console.log("REFRESH");
+  // chrome.notifications.create({
+  //   "type": "basic",
+  //   "iconUrl": "images/get_started48.png",
+  //   "title": "REFRESHING",
+  //   "message": "L'extension a été rafraichit"
+  // }, function() {
+  //   if (chrome.runtime.lastError)
+  //     console.log(chrome.runtime.lastError);
+  // });
   set_watching_anime_list_nautiljon();
   set_adn_list();
   set_crunchyroll_list();
   set_wakanim_list();
   set_to_watch_list();
-  chrome.alarms.create("refresh", {
+
+  setTimeout(refresh, 60000);
+}
+
+
+chrome.runtime.onInstalled.addListener(function() {
+  running = true;
+  console.log("OnInstalled");
+  chrome.storage.sync.clear();
+  refresh();
+  chrome.alarms.create("check_running", {
     'periodInMinutes': 1
   });
 });
 
 chrome.runtime.onStartup.addListener(function() {
+  running = true;
   console.log("OnStartup");
-  set_watching_anime_list_nautiljon();
-  set_adn_list();
-  set_crunchyroll_list();
-  set_wakanim_list();
-  set_to_watch_list();
-  chrome.alarms.create("refresh", {
-    'periodInMinutes': 1
-  });
+  refresh();
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
-  if (alarm.name == "refresh") {
-    console.log("REFRESHING");
-    set_watching_anime_list_nautiljon();
-    set_adn_list();
-    set_crunchyroll_list();
-    set_wakanim_list();
-    set_to_watch_list();
+
+//ADD GET TO EVERY LIST TO SET THEM IN LOCAL AND SET THE LIST IN SYNC WHEN CREATED
+chrome.alarms.onAlarm.addListener(function(alarm){
+  if(alarm.name == "check_running"){
+    if(!running){
+      chrome.storage.sync.get(["to_watch_list"],function(result){
+        if(chrome.runtime.lastError)
+          console.log(chrome.runtime.lastError);
+        else if(result.to_watch_list){
+          to_watch_list = result.to_watch_list;
+          running =true;
+          refresh();
+        }
+      });
+    }
   }
 });
 
 
-
 chrome.storage.onChanged.addListener(function(changes, areaName) {
+  console.log(changes);
   if (changes.to_watch_list && changes.to_watch_list.newValue) {
     changes.to_watch_list.newValue.forEach(function(elem) {
       var inside = false;
@@ -399,7 +427,7 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
             if (chrome.runtime.lastError)
               console.log(chrome.runtime.lastError);
           });
-        }else if (elem.from == "Wakanim") {
+        } else if (elem.from == "Wakanim") {
           chrome.notifications.create({
             "type": "basic",
             "iconUrl": "images/wakanim.jpg",
