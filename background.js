@@ -1,33 +1,52 @@
-let watching_anime_list;
-let adn_list;
-let crunchyroll_list;
-let wakanim_list;
+let watching_anime_list = [];
+
+let adn_list = [];
+let last_adn_date = new Date('2018-01-01');
+// let last_adn_date = new Date();
+let call_set_adn = 0;
+let end_set_adn = 0;
+
+let crunchyroll_list = [];
+let last_crunchyroll_date = new Date('2018-01-01');
+let call_set_crunchyroll = 0;
+let end_set_crunchyroll = 0;
+
+let wakanim_list = [];
+let last_ep_wakanim = null;
+let call_set_wakanim = 0;
+let end_set_wakanim = 0;
+
 let to_watch_list = [];
+
 let running;
 
-//NOT WORKING
-function set_watching_anime_list_my_anime_list() {
-  $.get("animelist.xml", function(data) {
-    var animes = new Array();
-    var $XML = $(data);
-    $XML.find("anime").each(function() {
-      var status = $(this).find("my_status").text();
-      if (status === "Watching") {
-        var item = {
-          title: $(this).find("series_title").text(),
-          watched_episodes: $(this).find("my_watched_episodes").text()
-        };
-        animes.push(item);
-      }
-    });
-    watching_anime_list = animes;
-  });
+function callback() {
+  if (chrome.runtime.lastError)
+    console.log(chrome.runtime.lastError);
 }
+//NOT WORKING
+// function set_watching_anime_list_my_anime_list() {
+//   $.get("animelist.xml", function(data) {
+//     var animes = new Array();
+//     var $XML = $(data);
+//     $XML.find("anime").each(function() {
+//       var status = $(this).find("my_status").text();
+//       if (status === "Watching") {
+//         var item = {
+//           title: $(this).find("series_title").text(),
+//           watched_episodes: $(this).find("my_watched_episodes").text()
+//         };
+//         animes.push(item);
+//       }
+//     });
+//     watching_anime_list = animes;
+//   });
+// }
 
 
 function set_watching_anime_list_nautiljon() {
   $.get("https://www.nautiljon.com/membre/vu,jarlax,anime.html?format=&statut=1", function(data) {
-    var animes = new Array();
+    var animes = [];
     $(data).find("tbody").each(function() {
       $(this).find("tr").each(function() {
         var tab = $(this).find("td");
@@ -36,14 +55,24 @@ function set_watching_anime_list_nautiljon() {
           link: tab[0].childNodes[0].getAttribute("href"),
           watched_episodes: tab[2].textContent.split(" /")[0],
         }
+        var add_to_list = true;
+        watching_anime_list.forEach(function(elem) {
+          if (elem.title == item.title)
+            add_to_list = false;
+        });
 
-        animes.push(item);
+        if (add_to_list) {
+          watching_anime_list.push(item);
+          chrome.storage.sync.set({
+            'watching_anime_list': watching_anime_list
+          }, callback());
+        }
+
 
       });
 
     });
 
-    watching_anime_list = animes;
   });
 }
 
@@ -51,19 +80,26 @@ function set_watching_anime_list_nautiljon() {
 
 function set_adn_list() {
   $.get("https://animedigitalnetwork.fr/rss", function(data) {
-    var items = new Array();
+    var items = [];
     $(data).find("item").each(function() {
       var item = {
         title: $(this).find("title").text(),
         link: $(this).find("link").text(),
         img: $(this).find("enclosure")[0].getAttribute("url"),
-        from: "ADN"
+        from: "ADN",
+        date: new Date($(this).find("pubDate").text())
       };
       items.push(item);
     });
 
-    adn_list = items;
-
+    items.reverse().forEach(function(elem) {
+      if (elem.date > last_adn_date) {
+        adn_list.push(elem);
+        // chrome.storage.sync.set({'adn_list' : adn_list},callback());
+        last_adn_date = elem.date;
+        // chrome.storage.sync.set({'last_adn_date' : last_adn_date},callback());
+      }
+    });
 
   });
 }
@@ -72,7 +108,7 @@ function set_adn_list() {
 
 function set_crunchyroll_list() {
   $.get("http://www.crunchyroll.com/rss?lang=frFR", function(data) {
-    var items = new Array();
+    var items = [];
     $(data).find("item").each(function() {
       var image;
       var image_set = false;
@@ -89,16 +125,25 @@ function set_crunchyroll_list() {
       var item = {
         title: $(this).find("title").text(),
         link: $(this).find("link").text(),
+        date: new Date($(this).find("pubDate").text()),
         img: image,
         seriesTitle: seriesTitle,
         from: "Crunchyroll"
       };
       items.push(item);
 
+      // chrome.storage.sync.set({'crunchyroll_list' : crunchyroll_list},callback());
+
+
     });
-
-    crunchyroll_list = items;
-
+    items.reverse().forEach(function(elem) {
+      if (elem.date >= last_crunchyroll_date) {
+        crunchyroll_list.push(elem);
+        // chrome.storage.sync.set({'crunchyroll_list' : crunchyroll_list},callback());
+        last_crunchyroll_date = elem.date;
+        // chrome.storage.sync.set({'last_crunchyroll_date' : last_crunchyroll_date},callback());
+      }
+    });
 
   });
 }
@@ -139,6 +184,18 @@ function set_wakanim_list() {
                     from: "Wakanim"
                   };
                   items.push(item);
+                  // var add_to_list = true;
+                  // if (wakanim_list) {
+                  //   wakanim_list.forEach(function(elem) {
+                  //     if (elem.title == item.title)
+                  //       add_to_list = false;
+                  //   });
+                  // }
+                  // if (add_to_list) {
+                  //   wakanim_list.push(item);
+
+                  // chrome.storage.sync.set({'wakanim_list' : wakanim_list},callback());
+                  // }
 
                 }
               }
@@ -149,7 +206,26 @@ function set_wakanim_list() {
       }
 
     });
-    wakanim_list = items;
+
+    if (!last_ep_wakanim) {
+      items.reverse();
+      items.forEach(function(elem) {
+        wakanim_list.push(elem);
+        last_ep_wakanim = elem;
+      });
+    } else {
+      var continuer = true;
+      items.forEach(function(elem) {
+        if (continuer && elem.title != last_ep_wakanim.title) {
+          wakanim_list.push(elem);
+
+        }else{
+          continuer = false;
+        }
+
+
+      });
+    }
 
   });
 }
@@ -159,10 +235,10 @@ function set_wakanim_list() {
 function set_to_watch_list_adn(item, title_alt) {
   if (adn_list) {
 
-    var titles = item.title.toLowerCase()
+    var titles = item.title.toLowerCase();
     if (title_alt)
       titles = titles.concat(" /", title_alt.toLowerCase());
-    adn_list.forEach(function(elem) {
+    adn_list.forEach(function(elem, index) {
       if (titles.includes(elem.title.split(" Épisode")[0].toLowerCase())) {
 
         var add_to_list = true;
@@ -170,25 +246,29 @@ function set_to_watch_list_adn(item, title_alt) {
           if (to_watch.title == elem.title)
             add_to_list = false;
         });
-        if (add_to_list)
+        if (add_to_list) {
           to_watch_list.push(elem);
 
-        chrome.storage.sync.set({
-          'to_watch_list': to_watch_list
-        }, function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: '#4688F1'
-            });
-          }
-        });
+          chrome.storage.sync.set({
+            'to_watch_list': to_watch_list
+          }, function() {
+            if (chrome.runtime.lastError) {
+              console.log(chrome.runtime.lastError);
+            } else {
+              chrome.browserAction.setBadgeText({
+                text: to_watch_list.length.toString()
+              });
+              chrome.browserAction.setBadgeBackgroundColor({
+                color: '#4688F1'
+              });
+            }
+          });
+        }
+
       }
     });
+    end_set_adn++;
+
   }
 }
 
@@ -230,6 +310,8 @@ function set_to_watch_list_crunchyroll(item, title_alt) {
       }
 
     });
+    end_set_crunchyroll++;
+
   }
 }
 
@@ -271,15 +353,52 @@ function set_to_watch_list_wakanim(item, title_alt) {
       }
 
     });
+    end_set_wakanim++;
+
   }
 }
 
 
+function check_adn_clear() {
+  if (call_set_adn == end_set_adn) {
+    adn_list = [];
+    call_set_adn = 0;
+    end_set_adn = 0;
+  } else {
+    setTimeout(check_adn_clear, 10000);
+  }
+}
+
+
+function check_crunchyroll_clear() {
+  if (call_set_crunchyroll == end_set_crunchyroll) {
+    crunchyroll_list = [];
+    call_set_crunchyroll = 0;
+    end_set_crunchyroll = 0;
+  } else {
+    setTimeout(check_crunchyroll_clear, 10000);
+  }
+}
+
+function check_wakanim_clear() {
+  if (call_set_wakanim == end_set_wakanim) {
+    wakanim_list = [];
+    call_set_wakanim = 0;
+    end_set_wakanim = 0;
+  } else {
+    setTimeout(check_wakanim_clear, 10000);
+  }
+}
 
 function set_to_watch_list() {
   if (watching_anime_list) {
+    setTimeout(check_adn_clear, 10000);
+    setTimeout(check_crunchyroll_clear, 10000);
+    setTimeout(check_wakanim_clear, 10000);
     watching_anime_list.forEach(function(elem) {
       $.get("https://www.nautiljon.com" + elem.link, function(data) {
+        console.clear();
+
         var info;
         var ul_array = $(data).find("ul");
         for (var i = 0; i < ul_array.length; i++) {
@@ -293,7 +412,7 @@ function set_to_watch_list() {
         }
         var licencie = false;
         var title_alt = null;
-        info.forEach(function(elem_li) {
+        info.forEach(function(elem_li, index) {
           var section = elem_li.textContent.split(" : ");
           var section_title = section.shift();
           var section_content = section.join('');
@@ -304,10 +423,13 @@ function set_to_watch_list() {
             licencie = true;
           } else if (licencie && section_title === "Editeur") {
             if ((section_content.split(' ')[1] === "ADN" || section_content.split(' ')[1] === "Kana")) {
+              call_set_adn++;
               set_to_watch_list_adn(elem, title_alt);
             } else if (section_content.split(' ')[1] === "Crunchyroll") {
+              call_set_crunchyroll++;
               set_to_watch_list_crunchyroll(elem, title_alt);
             } else if (section_content.split(' ')[1] === "Wakanim") {
+              call_set_wakanim++;
               set_to_watch_list_wakanim(elem, title_alt);
             }
 
@@ -316,12 +438,15 @@ function set_to_watch_list() {
             var editeur_set = false;
             section_content.split(' -').forEach(function(editeur) {
               if ((editeur.split(' ')[1] === "ADN" || editeur.split(' ')[1] === "Kana") && !editeur_set) {
+                call_set_adn++;
                 set_to_watch_list_adn(elem, title_alt);
                 editeur_set = true;
               } else if (editeur.split(' ')[1] === "Crunchyroll" && !editeur_set) {
+                call_set_crunchyroll++;
                 set_to_watch_list_crunchyroll(elem, title_alt);
                 editeur_set = true;
               } else if (section_content.split(' ')[1] === "Wakanim" && !editeur_set) {
+                call_set_wakanim++;
                 set_to_watch_list_wakanim(elem, title_alt);
                 editeur_set = true;
               }
@@ -330,6 +455,7 @@ function set_to_watch_list() {
             licencie = false;
           }
         });
+
       });
     });
   }
@@ -347,11 +473,22 @@ function refresh() {
   //   if (chrome.runtime.lastError)
   //     console.log(chrome.runtime.lastError);
   // });
+  set_to_watch_list();
+  set_watching_anime_list_nautiljon();
+  // adn_list = [];
+  set_adn_list();
+  set_crunchyroll_list();
+  set_wakanim_list();
+
+
+  setTimeout(refresh, 60000);
+}
+
+function startup() {
   set_watching_anime_list_nautiljon();
   set_adn_list();
   set_crunchyroll_list();
   set_wakanim_list();
-  set_to_watch_list();
 
   setTimeout(refresh, 60000);
 }
@@ -361,29 +498,38 @@ chrome.runtime.onInstalled.addListener(function() {
   running = true;
   console.log("OnInstalled");
   chrome.storage.sync.clear();
-  refresh();
+  startup();
   chrome.alarms.create("check_running", {
     'periodInMinutes': 1
   });
 });
 
+//also get the last dates pls
 chrome.runtime.onStartup.addListener(function() {
   running = true;
   console.log("OnStartup");
-  refresh();
+  chrome.storage.sync.get(["to_watch_list"], function(result) {
+    if (chrome.runtime.lastError)
+      console.log(chrome.runtime.lastError);
+    else if (result.to_watch_list) {
+      to_watch_list = result.to_watch_list;
+      running = true;
+      refresh();
+    }
+  });
 });
 
 
 //ADD GET TO EVERY LIST TO SET THEM IN LOCAL AND SET THE LIST IN SYNC WHEN CREATED
-chrome.alarms.onAlarm.addListener(function(alarm){
-  if(alarm.name == "check_running"){
-    if(!running){
-      chrome.storage.sync.get(["to_watch_list"],function(result){
-        if(chrome.runtime.lastError)
+chrome.alarms.onAlarm.addListener(function(alarm) {
+  if (alarm.name == "check_running") {
+    if (!running) {
+      chrome.storage.sync.get(["to_watch_list"], function(result) {
+        if (chrome.runtime.lastError)
           console.log(chrome.runtime.lastError);
-        else if(result.to_watch_list){
+        else if (result.to_watch_list) {
           to_watch_list = result.to_watch_list;
-          running =true;
+          running = true;
           refresh();
         }
       });
@@ -393,52 +539,86 @@ chrome.alarms.onAlarm.addListener(function(alarm){
 
 
 chrome.storage.onChanged.addListener(function(changes, areaName) {
-  console.log(changes);
   if (changes.to_watch_list && changes.to_watch_list.newValue) {
-    changes.to_watch_list.newValue.forEach(function(elem) {
-      var inside = false;
-      if (changes.to_watch_list.oldValue) {
-        changes.to_watch_list.oldValue.forEach(function(elem2) {
-          if (elem.title == elem2.title) {
-            inside = true;
+    if (changes.to_watch_list.oldValue) {
+      if (changes.to_watch_list.oldValue.length < changes.to_watch_list.newValue.length) {
+        changes.to_watch_list.newValue.forEach(function(elem) {
+          var inside = false;
+          if (changes.to_watch_list.oldValue) {
+            changes.to_watch_list.oldValue.forEach(function(elem2) {
+              if (elem.title == elem2.title) {
+                inside = true;
+              }
+            });
+          }
+          if (!inside) {
+
+            if (elem.from == "ADN") {
+              chrome.notifications.create({
+                "type": "basic",
+                "iconUrl": "images/adn.png",
+                "title": elem.title,
+                "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
+              }, callback());
+
+            } else if (elem.from == "Crunchyroll") {
+              chrome.notifications.create({
+                "type": "basic",
+                "iconUrl": "images/crunchyroll.png",
+                "title": elem.title,
+                "message": "Un nouvel épisode de " + elem.title.split(' - ')[0] + " est sorti sur Crunchyroll!"
+              }, callback());
+            } else if (elem.from == "Wakanim") {
+              chrome.notifications.create({
+                "type": "basic",
+                "iconUrl": "images/wakanim.jpg",
+                "title": elem.title,
+                "message": "Un nouvel épisode de " + elem.title.split(' Saison')[0] + " est sorti sur Wakanim!"
+              }, callback());
+            }
           }
         });
+      } else {
+        to_watch_list = changes.to_watch_list.newValue;
       }
-      if (!inside) {
+    }else{
 
-        if (elem.from == "ADN") {
-          chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": "images/adn.png",
-            "title": elem.title,
-            "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
-          }, function() {
-            if (chrome.runtime.lastError)
-              console.log(chrome.runtime.lastError);
-          });
-
-        } else if (elem.from == "Crunchyroll") {
-          chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": "images/crunchyroll.png",
-            "title": elem.title,
-            "message": "Un nouvel épisode de " + elem.title.split(' - ')[0] + " est sorti sur Crunchyroll!"
-          }, function() {
-            if (chrome.runtime.lastError)
-              console.log(chrome.runtime.lastError);
-          });
-        } else if (elem.from == "Wakanim") {
-          chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": "images/wakanim.jpg",
-            "title": elem.title,
-            "message": "Un nouvel épisode de " + elem.title.split(' Saison')[0] + " est sorti sur Wakanim!"
-          }, function() {
-            if (chrome.runtime.lastError)
-              console.log(chrome.runtime.lastError);
+      changes.to_watch_list.newValue.forEach(function(elem) {
+        var inside = false;
+        if (changes.to_watch_list.oldValue) {
+          changes.to_watch_list.oldValue.forEach(function(elem2) {
+            if (elem.title == elem2.title) {
+              inside = true;
+            }
           });
         }
-      }
-    });
+        if (!inside) {
+
+          if (elem.from == "ADN") {
+            chrome.notifications.create({
+              "type": "basic",
+              "iconUrl": "images/adn.png",
+              "title": elem.title,
+              "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
+            }, callback());
+
+          } else if (elem.from == "Crunchyroll") {
+            chrome.notifications.create({
+              "type": "basic",
+              "iconUrl": "images/crunchyroll.png",
+              "title": elem.title,
+              "message": "Un nouvel épisode de " + elem.title.split(' - ')[0] + " est sorti sur Crunchyroll!"
+            }, callback());
+          } else if (elem.from == "Wakanim") {
+            chrome.notifications.create({
+              "type": "basic",
+              "iconUrl": "images/wakanim.jpg",
+              "title": elem.title,
+              "message": "Un nouvel épisode de " + elem.title.split(' Saison')[0] + " est sorti sur Wakanim!"
+            }, callback());
+          }
+        }
+      });
+    }
   }
 });
