@@ -55,7 +55,6 @@ function display_to_watch_list() {
       });
       icon[0].classList.add("material-icons");
       icon[0].onclick = function(){
-        console.log("COUCOU");
         to_watch_list.forEach(function(e2,index){
           if(e2.title == elem.title)
             to_watch_list.splice(index,1);
