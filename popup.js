@@ -12,6 +12,7 @@ function display_to_watch_list() {
   chrome.storage.sync.get(['to_watch_list'], function(result) {
     var to_watch_list = result.to_watch_list;
     to_watch_list.reverse();
+    console.log(to_watch_list);
     to_watch_list.forEach(function(elem) {
       var elem_display = $('<div/>').hover(function() {
         $(this).css("background-color", "#37474f");
@@ -26,11 +27,14 @@ function display_to_watch_list() {
       col1[0].classList.add("col");
       col1[0].classList.add("s6");
       var image = $('<img/>');
-      if (elem.img.includes("http:") || elem.img.includes("https:"))
+      if(elem.img){
+        if (elem.img.includes("http:") || elem.img.includes("https:"))
         image[0].setAttribute("src", elem.img);
-      else {
-        image[0].setAttribute("src", "https:" + elem.img);
-        // image[0].style.width = "160px";
+        else {
+          image[0].setAttribute("src", "https:" + elem.img);
+          // image[0].style.width = "160px";
+
+        }
 
       }
       image[0].classList.add("responsive-img");
@@ -40,6 +44,7 @@ function display_to_watch_list() {
       col2[0].classList.add("col");
       col2[0].classList.add("s5");
       col2[0].style.paddingTop = "15px";
+      col2[0].style.paddingBottom = "50px";
       elem_display[0].append(col2[0]);
 
       var icon = $("<i/>").text("cancel");
