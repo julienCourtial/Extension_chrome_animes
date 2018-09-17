@@ -93,10 +93,10 @@ function set_watching_anime_list_nautiljon() {
 
               var table = [];
 
-              editeurs = section_content.split(" - ");
+              editeurs = section_content.split(" -");
 
               for(var m = 0; m < editeurs.length ; m++){
-                table.push(editeurs[m].split(" (")[0]);
+                table.push(editeurs[m].split(" ")[1]);
               }
               licence = table.join(" - ");
 
@@ -107,7 +107,8 @@ function set_watching_anime_list_nautiljon() {
           var item = {
             title: animes[0].childNodes[0].text,
             watched_episodes: animes[2].textContent.split(" /")[0],
-            editeur : licence
+            editeur : licence,
+            title_alt : title_alt
           }
           var add_to_list = true;
 
@@ -351,12 +352,12 @@ function set_wakanim_list() {
 
 
 
-function set_to_watch_list_adn(item, title_alt) {
+function set_to_watch_list_adn(item) {
   if (adn_list) {
 
     var titles = item.title.toLowerCase();
-    if (title_alt)
-      titles = titles.concat(" /", title_alt.toLowerCase());
+    if (item.title_alt)
+      titles = titles.concat(" /", item.title_alt.toLowerCase());
     adn_list.forEach(function(elem, index) {
       if (titles.includes(elem.title.split(" Épisode")[0].toLowerCase())) {
         // adn_list.splice(index, 1);
@@ -394,14 +395,14 @@ function set_to_watch_list_adn(item, title_alt) {
 
 
 
-function set_to_watch_list_crunchyroll(item, title_alt) {
+function set_to_watch_list_crunchyroll(item) {
   if (crunchyroll_list) {
 
     var titles = item.title.toLowerCase()
     if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (title_alt)
-      titles = titles.concat(" /", title_alt.toLowerCase());
+    if (item.title_alt)
+      titles = titles.concat(" /", item.title_alt.toLowerCase());
     crunchyroll_list.forEach(function(elem, index) {
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
         // crunchyroll_list.splice(index, 1);
@@ -439,14 +440,14 @@ function set_to_watch_list_crunchyroll(item, title_alt) {
 
 
 
-function set_to_watch_list_wakanim(item, title_alt) {
+function set_to_watch_list_wakanim(item) {
   if (wakanim_list) {
 
     var titles = item.title.toLowerCase()
     if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (title_alt)
-      titles = titles.concat(" /", title_alt.toLowerCase());
+    if (item.title_alt)
+      titles = titles.concat(" /", item.title_alt.toLowerCase());
     console.log(titles);
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       elem = wakanim_list[i];
@@ -519,80 +520,27 @@ function set_to_watch_list_wakanim(item, title_alt) {
 
 function set_to_watch_list() {
   if (watching_anime_list) {
-    // setTimeout(check_adn_clear, 10000);
-    // setTimeout(check_crunchyroll_clear, 10000);
-    // setTimeout(check_wakanim_clear, 10000);
+
     for(var i = 0; i< watching_anime_list.length ; i++){
       var elem = watching_anime_list[i];
 
-      $.get("https://www.nautiljon.com" + elem.link, function(data) {
-        // console.clear();
+      editeurs = elem.editeur.split(" - ");
+      editeur_found = false;
 
-        var info;
-        var ul_array = $(data).find("ul");
-        for (var i = 0; i < ul_array.length; i++) {
-          if (ul_array[i].classList[0] == "mb10") {
-            info = ul_array[i].childNodes;
-          }
+      for(var j = 0; !editeur_found && j < editeurs.length ; j++){
+        if(editeurs[j] === "ADN" || editeurs[j] === "Kana"){
+          set_to_watch_list_adn(elem);
+          editeur_found = true;
+        }else if (editeurs[j] === "Wakanim" ){
+          set_to_watch_list_wakanim(elem);
+          editeur_found = true;
+
+        }else if(editeurs[j] === "Crunchyroll"){
+          set_to_watch_list_crunchyroll(elem);
+          editeur_found = true;
+
         }
-        if (!info) {
-          console.log("Pas une bonne page nautiljon");
-          return;
-        }
-        var licencie = false;
-        var title_alt = null;
-        for(var j = 0 ; j < info.length ; j++){
-          var elem_li = info[j];
-
-          var section = elem_li.textContent.split(" : ");
-          var section_title = section.shift();
-          var section_content = section.join('');
-
-          if (section_title === "Titre alternatif") {
-            title_alt = section_content;
-          } else if (section_title === "Licencié en France") {
-            licencie = true;
-          } else if (licencie && section_title === "Editeur") {
-            if ((section_content.split(' ')[1] === "ADN" || section_content.split(' ')[1] === "Kana")) {
-              call_set_adn++;
-              set_to_watch_list_adn(elem, title_alt);
-            } else if (section_content.split(' ')[1] === "Crunchyroll") {
-              call_set_crunchyroll++;
-              set_to_watch_list_crunchyroll(elem, title_alt);
-            } else if (section_content.split(' ')[1] === "Wakanim") {
-              call_set_wakanim++;
-              set_to_watch_list_wakanim(elem, title_alt);
-            }
-
-            licencie = false;
-          } else if (licencie && section_title === "Editeurs") {
-            var editeur_set = false;
-            var tab = section_content.split(' -');
-            var k =0;
-            while(!editeur_set && k < tab.length ){
-              var editeur = tab[k];
-
-              if ((editeur.split(' ')[1] === "ADN" || editeur.split(' ')[1] === "Kana")) {
-                call_set_adn++;
-                set_to_watch_list_adn(elem, title_alt);
-                editeur_set = true;
-              } else if (editeur.split(' ')[1] === "Crunchyroll") {
-                call_set_crunchyroll++;
-                set_to_watch_list_crunchyroll(elem, title_alt);
-                editeur_set = true;
-              } else if (section_content.split(' ')[1] === "Wakanim") {
-                call_set_wakanim++;
-                set_to_watch_list_wakanim(elem, title_alt);
-                editeur_set = true;
-              }
-
-              k++;
-            }
-            licencie = false;
-          }
-        }
-
-      });
+      }
     }
   }
 }
