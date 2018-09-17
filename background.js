@@ -53,24 +53,80 @@ function set_watching_anime_list_nautiljon() {
     var animes = [];
     $(data).find("tbody").each(function() {
       $(this).find("tr").each(function() {
-        var tab = $(this).find("td");
-        var item = {
-          title: tab[0].childNodes[0].text,
-          link: tab[0].childNodes[0].getAttribute("href"),
-          watched_episodes: tab[2].textContent.split(" /")[0],
-        }
-        var add_to_list = true;
-        watching_anime_list.forEach(function(elem) {
-          if (elem.title == item.title)
-            add_to_list = false;
+
+        var animes = $(this).find("td");
+
+        var licence = null;
+
+        $.get("https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"), function(data2) {
+          // console.clear();
+
+          var info;
+          var ul_array = $(data2).find("ul");
+          for (var i = 0; i < ul_array.length; i++) {
+            if (ul_array[i].classList[0] == "mb10") {
+              info = ul_array[i].childNodes;
+            }
+          }
+          if (!info) {
+            console.log("Pas une bonne page nautiljon");
+            return;
+          }
+          var licencie = false;
+          var title_alt = null;
+          for(var j = 0 ; j < info.length ; j++){
+            var elem_li = info[j];
+
+            var section = elem_li.textContent.split(" : ");
+            var section_title = section.shift();
+            var section_content = section.join('');
+
+            if (section_title === "Titre alternatif") {
+              title_alt = section_content;
+            } else if (section_title === "Licencié en France") {
+              licencie = true;
+            } else if (licencie && section_title === "Editeur") {
+              licence = section_content.split(' ')[1]
+
+              licencie = false;
+            } else if (licencie && section_title === "Editeurs") {
+
+              var table = [];
+
+              editeurs = section_content.split(" - ");
+
+              for(var m = 0; m < editeurs.length ; m++){
+                table.push(editeurs[m].split(" (")[0]);
+              }
+              licence = table.join(" - ");
+
+              licencie = false;
+            }
+          }
+
+          var item = {
+            title: animes[0].childNodes[0].text,
+            watched_episodes: animes[2].textContent.split(" /")[0],
+            editeur : licence
+          }
+          var add_to_list = true;
+
+          for(var i = 0; i < watching_anime_list.length ; i++){
+            if (watching_anime_list[i].title == item.title)
+              add_to_list = false;
+          }
+
+          if (add_to_list) {
+            watching_anime_list.push(item);
+            chrome.storage.sync.set({
+              'watching_anime_list': watching_anime_list
+            }, callback());
+          }
+
         });
 
-        if (add_to_list) {
-          watching_anime_list.push(item);
-          chrome.storage.sync.set({
-            'watching_anime_list': watching_anime_list
-          }, callback());
-        }
+
+
 
 
       });
