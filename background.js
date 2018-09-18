@@ -28,24 +28,6 @@ function callback() {
   if (chrome.runtime.lastError)
     console.log(chrome.runtime.lastError);
 }
-//NOT WORKING
-// function set_watching_anime_list_my_anime_list() {
-//   $.get("animelist.xml", function(data) {
-//     var animes = new Array();
-//     var $XML = $(data);
-//     $XML.find("anime").each(function() {
-//       var status = $(this).find("my_status").text();
-//       if (status === "Watching") {
-//         var item = {
-//           title: $(this).find("series_title").text(),
-//           watched_episodes: $(this).find("my_watched_episodes").text()
-//         };
-//         animes.push(item);
-//       }
-//     });
-//     watching_anime_list = animes;
-//   });
-// }
 
 
 function set_watching_anime_list_nautiljon() {
@@ -59,7 +41,6 @@ function set_watching_anime_list_nautiljon() {
         var licence = null;
 
         $.get("https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"), function(data2) {
-          // console.clear();
 
           var info;
           var ul_array = $(data2).find("ul");
@@ -193,15 +174,18 @@ function set_adn_list() {
 
 
 function set_crunchyroll_list() {
-  // crunchyroll_list = [];
-  var to_remove = [];
-  crunchyroll_list.forEach(function(elem, index) {
-    if (elem.checked)
-      to_remove.push(index);
-  });
-  to_remove.forEach(function(elem) {
-    crunchyroll_list.splice(elem, 1);
-  });
+
+  var after_last = false;
+  for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
+    if (after_last)
+      crunchyroll_list.splice(i, 1);
+    else if (crunchyroll_list[i].title == last_elem_crunchyroll.title)
+      after_last = true;
+
+
+  }
+
+
   $.get("http://www.crunchyroll.com/rss?lang=frFR", function(data) {
     var items = [];
     $(data).find("item").each(function() {
@@ -220,11 +204,9 @@ function set_crunchyroll_list() {
       var item = {
         title: $(this).find("title").text(),
         link: $(this).find("link").text(),
-        date: new Date($(this).find("pubDate").text()),
         img: image,
         seriesTitle: seriesTitle,
         from: "Crunchyroll",
-        checked: false
       };
       items.push(item);
 
@@ -232,6 +214,9 @@ function set_crunchyroll_list() {
 
 
     });
+
+
+    //TODO I LEFT HERE
     items.reverse().forEach(function(elem) {
       if (elem.date > last_crunchyroll_date) {
         crunchyroll_list.push(elem);
@@ -260,7 +245,7 @@ function set_crunchyroll_list() {
 
 
 function set_wakanim_list() {
-  // wakanim_list = [];
+
   var after_last = false;
   for (var i = wakanim_list.length - 1; i >= 0; i--) {
     if (after_last)
@@ -448,7 +433,6 @@ function set_to_watch_list_wakanim(item) {
       titles = titles.concat(" / ", titles.split(" (")[0]);
     if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
-    console.log(titles);
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       elem = wakanim_list[i];
       if (titles.includes(elem.title.split(" Saison")[0].toLowerCase())) {
@@ -479,7 +463,6 @@ function set_to_watch_list_wakanim(item) {
       }
       // elem.checked = true;
     }
-    console.log(wakanim_list);
 
     // end_set_wakanim++;
 
