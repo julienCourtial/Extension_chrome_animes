@@ -311,11 +311,13 @@ function set_to_watch_list_adn(item) {
     adn_list.forEach(function(elem) {
       if (titles.includes(elem.title.split(" Épisode")[0].toLowerCase())) {
         var add_to_list = true;
-        to_watch_list.forEach(function(to_watch) {
-          if (to_watch.title == elem.title) 
+        for (var i = 0; add_to_list && i < to_watch_list.length; i++) {
+          if (to_watch_list[i].title == elem.title) {
+
             add_to_list = false;
           }
-        );
+
+        }
         if (add_to_list) {
           to_watch_list.push(elem);
 
@@ -349,11 +351,11 @@ function set_to_watch_list_crunchyroll(item) {
     crunchyroll_list.forEach(function(elem) {
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
         var add_to_list = true;
-        to_watch_list.forEach(function(to_watch) {
-          if (to_watch.title == elem.title) 
+        for (var i = 0; add_to_list && i < to_watch_list.length; i++) {
+          if (to_watch_list[i].title == elem.title) {
             add_to_list = false;
           }
-        );
+        }
         if (add_to_list) 
           to_watch_list.push(elem);
         
@@ -567,11 +569,11 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
         changes.to_watch_list.newValue.forEach(function(elem) {
           var inside = false;
           if (changes.to_watch_list.oldValue) {
-            changes.to_watch_list.oldValue.forEach(function(elem2) {
-              if (elem.title == elem2.title) {
+            for (var i = 0; !inside && i < changes.to_watch_list.oldValue.length; i++) {
+              if (elem.title == changes.to_watch_list.oldValue[i].title) {
                 inside = true;
               }
-            });
+            }
           }
           if (!inside) {
 
