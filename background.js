@@ -15,7 +15,7 @@ let notification_links = [];
 let running;
 
 function callback() {
-  if (chrome.runtime.lastError) 
+  if (chrome.runtime.lastError)
     console.log(chrome.runtime.lastError);
   }
 
@@ -83,10 +83,10 @@ function set_watching_anime_list_nautiljon() {
           var add_to_list = true;
 
           for (var i = 0; i < watching_anime_list.length; i++) {
-            if (watching_anime_list[i].title == item.title) 
+            if (watching_anime_list[i].title == item.title)
               add_to_list = false;
             }
-          
+
           if (add_to_list) {
             watching_anime_list.push(item);
             chrome.storage.sync.set({
@@ -106,13 +106,15 @@ function set_watching_anime_list_nautiljon() {
 function set_adn_list() {
   var after_last = false;
   for (var i = adn_list.length - 1; i >= 0; i--) {
-    if (after_last) 
+    if (after_last)
       adn_list.splice(i, 1);
-    else if (adn_list[i].title == last_ep_adn.title) 
+    else if (adn_list[i].title == last_ep_adn.title){
       after_last = true;
+      adn_list.splice(i, 1);
+    }
 
     }
-  
+
   $.get("https://animedigitalnetwork.fr/rss", function(data) {
     var items = [];
     $(data).find("item").each(function() {
@@ -154,13 +156,15 @@ function set_crunchyroll_list() {
 
   var after_last = false;
   for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
-    if (after_last) 
+    if (after_last)
       crunchyroll_list.splice(i, 1);
-    else if (crunchyroll_list[i].title == last_ep_crunchyroll.title) 
+    else if (crunchyroll_list[i].title == last_ep_crunchyroll.title){
       after_last = true;
+      crunchyroll_list.splice(i, 1);
+    }
 
     }
-  
+
   $.get("http://www.crunchyroll.com/rss?lang=frFR", function(data) {
     var items = [];
     $(data).find("item").each(function() {
@@ -216,13 +220,15 @@ function set_wakanim_list() {
 
   var after_last = false;
   for (var i = wakanim_list.length - 1; i >= 0; i--) {
-    if (after_last) 
+    if (after_last)
       wakanim_list.splice(i, 1);
-    else if (wakanim_list[i].title == last_ep_wakanim.title) 
+    else if (wakanim_list[i].title == last_ep_wakanim.title) {
       after_last = true;
+      wakanim_list.splice(i, 1);
+    }
 
     }
-  
+
   $.get("https://www.wakanim.tv/fr/v2", function(data) {
     var items = new Array();
     $(data).each(function(elem) {
@@ -306,7 +312,7 @@ function set_to_watch_list_adn(item) {
   if (adn_list) {
 
     var titles = item.title.toLowerCase();
-    if (item.title_alt) 
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     adn_list.forEach(function(elem) {
       if (titles.includes(elem.title.split(" Épisode")[0].toLowerCase())) {
@@ -344,9 +350,9 @@ function set_to_watch_list_crunchyroll(item) {
   if (crunchyroll_list) {
 
     var titles = item.title.toLowerCase()
-    if (titles.includes("(")) 
+    if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (item.title_alt) 
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     crunchyroll_list.forEach(function(elem) {
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
@@ -356,9 +362,9 @@ function set_to_watch_list_crunchyroll(item) {
             add_to_list = false;
           }
         }
-        if (add_to_list) 
+        if (add_to_list)
           to_watch_list.push(elem);
-        
+
         chrome.storage.sync.set({
           'to_watch_list': to_watch_list
         }, function() {
@@ -381,21 +387,21 @@ function set_to_watch_list_wakanim(item) {
   if (wakanim_list) {
 
     var titles = item.title.toLowerCase()
-    if (titles.includes("(")) 
+    if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (item.title_alt) 
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       elem = wakanim_list[i];
       if (titles.includes(elem.title.split(" Saison")[0].toLowerCase())) {
         var add_to_list = true;
         for (var j = 0; j < to_watch_list.length; j++) {
-          if (to_watch_list[j].title == elem.title) 
+          if (to_watch_list[j].title == elem.title)
             add_to_list = false;
           }
-        if (add_to_list) 
+        if (add_to_list)
           to_watch_list.push(elem);
-        
+
         chrome.storage.sync.set({
           'to_watch_list': to_watch_list
         }, function() {
@@ -485,27 +491,27 @@ chrome.runtime.onInstalled.addListener(function() {
     "last_elem_adn",
     "last_elem_crunchyroll"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
-      if (result.to_watch_list) 
+      if (result.to_watch_list)
         to_watch_list = result.to_watch_list;
-      
-      if (result.last_adn_date) 
+
+      if (result.last_adn_date)
         last_adn_date = new Date(result.last_adn_date);
-      
-      if (result.last_crunchyroll_date) 
+
+      if (result.last_crunchyroll_date)
         last_crunchyroll_date = new Date(result.last_crunchyroll_date);
-      
-      if (result.last_ep_wakanim) 
+
+      if (result.last_ep_wakanim)
         last_ep_wakanim = result.last_ep_wakanim;
-      
-      if (result.last_elem_adn) 
+
+      if (result.last_elem_adn)
         last_elem_adn = result.last_elem_adn;
-      
-      if (result.last_elem_crunchyroll) 
+
+      if (result.last_elem_crunchyroll)
         last_elem_crunchyroll = result.last_elem_crunchyroll;
-      
+
       chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
       chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
     }
@@ -522,7 +528,7 @@ chrome.runtime.onStartup.addListener(function() {
   chrome.storage.sync.get([
     "to_watch_list", "last_adn_date", "last_crunchyroll_date", "last_ep_wakanim"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else if (result.to_watch_list && result.last_adn_date && result.last_crunchyroll_date && result.last_ep_wakanim) {
       to_watch_list = result.to_watch_list;
@@ -545,7 +551,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
       chrome.storage.sync.get([
         "to_watch_list", "last_adn_date", "last_crunchyroll_date", "last_ep_wakanim"
       ], function(result) {
-        if (chrome.runtime.lastError) 
+        if (chrome.runtime.lastError)
           console.log(chrome.runtime.lastError);
         else if (result.to_watch_list && result.last_adn_date && result.last_crunchyroll_date && result.last_ep_wakanim) {
           to_watch_list = result.to_watch_list;
