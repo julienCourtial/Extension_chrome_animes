@@ -234,7 +234,7 @@ function set_wakanim_list() {
   for (var i = wakanim_list.length - 1; i >= 0; i--) {
     if (after_last) 
       wakanim_list.splice(i, 1);
-    else if (wakanim_list[i].date >= last_ep_wakanim.date) {
+    else if (wakanim_list[i].title == last_ep_wakanim.title) {
       after_last = true;
       wakanim_list.splice(i, 1);
     }
@@ -280,7 +280,6 @@ function set_wakanim_list() {
                     title: series + " " + saison + " Épisode " + num_ep,
                     link: "https://www.wakanim.tv" + link,
                     img: "https:" + image,
-                    date: new Date(),
                     from: "Wakanim"
                   };
                   items.push(item);
@@ -308,13 +307,8 @@ function set_wakanim_list() {
         if (after_last) {
           wakanim_list.push(items[i]);
           last_ep_wakanim = items[i];
-        } else if (items[i].date == last_ep_wakanim.date) {
+        } else if (items[i].title == last_ep_wakanim.title) {
           after_last = true;
-        } else if (items[i].date > last_ep_wakanim.date) {
-          after_last = true;
-          wakanim_list.push(items[i]);
-          last_ep_wakanim = items[i];
-
         }
       }
     }
