@@ -119,10 +119,14 @@ function set_adn_list() {
   $.get("https://animedigitalnetwork.fr/rss", function(data) {
     var items = [];
     $(data).find("item").each(function() {
+      var img = $(this).find("enclosure")[0].getAttribute("url");
+      if (!img.includes("http")) {
+        img = "https:" + img;
+      }
       var item = {
         title: $(this).find("title").text(),
         link: $(this).find("link").text(),
-        img: $(this).find("enclosure")[0].getAttribute("url"),
+        img: img,
         date: new Date($(this).find("pubDate").text()),
         from: "ADN"
       };
