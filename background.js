@@ -194,7 +194,6 @@ function set_crunchyroll_list() {
         link: $(this).find("link").text(),
         img: image,
         seriesTitle: seriesTitle,
-        date: new Date($(this).find("pubDate").text()),
         from: "Crunchyroll"
       };
       items.push(item);
