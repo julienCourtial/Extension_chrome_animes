@@ -9,8 +9,20 @@
     <link type="text/css" rel="stylesheet" href="popup.css" media="screen,projection"/>
   </head>
 
-  <body class="blue-grey darken-4" style="width:410px;margin-left:10px;">
-    <div id="list_episode" style="width:400px;" class="blue-grey-text text-lighten-4"></div>
+  <body class="blue-grey darken-4" style="width:410px">
+    <div id="list_episode" class="blue-grey-text text-lighten-4"></div>
+
+    <template id="card_anime">
+      <div class="elem_list row">
+        <div class="col s6 thumbnail">
+          <img src="" alt="" class="responsive-img">
+        </div>
+        <div class="col s5 description"></div>
+        <div class="col s1 icon-remove">
+          <i class="remove material-icons">cancel</i>
+        </div>
+      </div>
+    </template>
     <script src="jquery-3.3.1.min.js"></script>
     <script src="popup.js"></script>
     <script type="text/javascript" src="materialize.min.js"></script>
