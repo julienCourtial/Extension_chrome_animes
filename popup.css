@@ -1,14 +1,14 @@
-.elem_list:hover{
+/* .elem_list:hover{
   background-color: #37474f;
-}
+} */
 
 .elem_list{
-  border-bottom-color: #607d8b;
-  border-bottom-style: solid;
+  /* border-bottom-color: #607d8b;
+  border-bottom-style: solid; */
   margin-bottom: 0px;
 }
 
-.elem_list .description{
+/* .elem_list .description{
   padding-top: 15px;
   padding-bottom: 50px;
 }
@@ -26,4 +26,4 @@
 .elem_list .icon-remove{
   margin-top: 30px;
   padding-left: 5px;
-}
+} */

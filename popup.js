@@ -22,8 +22,8 @@ function display_to_watch_list() {
         img.setAttribute("src", elem.img);
       var description = clone.querySelector(".description");
       description.textContent = elem.title;
-      var icon = clone.querySelector(".remove")
-      icon.onclick = function() {
+      var remove = clone.querySelector(".remove")
+      remove.onclick = function() {
         to_watch_list.forEach(function(e2, index) {
           if (e2.title == elem.title) 
             to_watch_list.splice(index, 1);
@@ -42,10 +42,8 @@ function display_to_watch_list() {
         });
       };
 
-      description.onclick = function() {
-        chrome.tabs.create({'url': elem.link});
-      }
-      img.onclick = function() {
+      var watch = clone.querySelector(".watch");
+      watch.onclick = function() {
         chrome.tabs.create({'url': elem.link});
       }
 
