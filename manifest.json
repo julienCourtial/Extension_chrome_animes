@@ -1,6 +1,6 @@
 {
   "name": "Getting Started Example",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Build an Extension!",
   "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {
