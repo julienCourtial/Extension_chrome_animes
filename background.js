@@ -434,7 +434,7 @@ function set_to_watch_list_wakanim(item) {
       var true_title = elem.title;
       if (true_title.includes("-"))
         true_title = true_title.split(" -")[0];
-      if (titles.includes(true_title.split(" Saison")[0].toLowerCase())) {
+      if (titles.includes(true_title.split(" Saison")[0].toLowerCase()) || titles.includes(true_title.split(" Arc")[0].toLowerCase())) {
         var add_to_list = true;
         for (var j = 0; j < to_watch_list.length; j++) {
           if (to_watch_list[j].title == elem.title)
