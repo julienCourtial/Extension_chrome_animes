@@ -115,20 +115,6 @@ function display_watching_list() {
         title.textContent = elem.title;
         var description = clone.querySelector(".description");
         description.textContent = elem.description;
-        var remove = clone.querySelector(".remove");
-        remove.onclick = function() {
-          watching_anime_list.forEach(function(e2, index) {
-            if (e2.title == elem.title) 
-              watching_anime_list.splice(index, 1);
-            chrome.storage.sync.set({
-              "watching_anime_list": watching_anime_list
-            }, function() {
-              if (chrome.runtime.lastError) {
-                console.log(chrome.runtime.lastError);
-              }
-            });
-          });
-        };
 
         var more = clone.querySelector(".more");
         more.onclick = function() {

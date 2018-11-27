@@ -103,6 +103,90 @@ function retrieve_watching_anime_list() {
   });
 }
 
+function store_to_watch_list() {
+  console.log("storing to watch list");
+  let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
+  if (nb > 3) {
+    let div = Math.floor(to_watch_list.length / 4);
+    chrome.storage.sync.set({
+      'nb_to_watch_list': 4,
+      'to_watch_list1': to_watch_list.slice(0, div),
+      'to_watch_list2': to_watch_list.slice(div, 2 * div),
+      'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
+      'to_watch_list4': to_watch_list.slice(3 * div, 4 * div)
+    }, callback());
+    if (4 * div < to_watch_list.length) {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 5,
+        'to_watch_list5': to_watch_list.slice(4 * div, to_watch_list.length)
+      }, callback());
+    }
+  } else if (nb > 2) {
+    let div = Math.floor(to_watch_list.length / 3);
+    chrome.storage.sync.set({
+      'nb_to_watch_list': 3,
+      'to_watch_list1': to_watch_list.slice(0, div),
+      'to_watch_list2': to_watch_list.slice(div, 2 * div),
+      'to_watch_list3': to_watch_list.slice(2 * div, 3 * div)
+    }, callback());
+    if (3 * div < to_watch_list.length) {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 4,
+        'to_watch_list4': to_watch_list.slice(3 * div, to_watch_list.length)
+      }, callback());
+    }
+  } else if (nb > 1) {
+    let div = Math.floor(to_watch_list.length / 2);
+    chrome.storage.sync.set({
+      'nb_to_watch_list': 2,
+      'to_watch_list1': to_watch_list.slice(0, div),
+      'to_watch_list2': to_watch_list.slice(div, 2 * div)
+    }, callback());
+    if (2 * div < to_watch_list.length) {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 3,
+        'to_watch_list3': to_watch_list.slice(2 * div, to_watch_list.length)
+      }, callback());
+    }
+  } else {
+    chrome.storage.sync.set({
+      'nb_to_watch_list': 1,
+      'to_watch_list1': to_watch_list
+    }, callback());
+  }
+}
+
+function retrieve_to_watch_list() {
+  chrome.storage.sync.get([
+    "nb_to_watch_list",
+    "to_watch_list1",
+    "to_watch_list2",
+    "to_watch_list3",
+    "to_watch_list4",
+    "to_watch_list5"
+  ], function(result) {
+    if (chrome.runtime.lastError) 
+      console.log(chrome.runtime.lastError);
+    else {
+      if (result.nb_to_watch_list >= 1) {
+        to_watch_list = to_watch_list.concat(result.to_watch_list1);
+      }
+      if (result.nb_to_watch_list >= 2) {
+        to_watch_list = to_watch_list.concat(result.to_watch_list2);
+      }
+      if (result.nb_to_watch_list >= 3) {
+        to_watch_list = to_watch_list.concat(result.to_watch_list3);
+      }
+      if (result.nb_to_watch_list >= 4) {
+        to_watch_list = to_watch_list.concat(result.to_watch_list4);
+      }
+      if (result.nb_to_watch_list >= 5) {
+        to_watch_list = to_watch_list.concat(result.to_watch_list5);
+      }
+    }
+  });
+}
+
 //TODO a revoir
 //TODO ne pas construire item avant de verifier s'il sera a ajouter
 //TODO remove item in list when not on nautiljon anymore
@@ -456,17 +540,8 @@ function set_to_watch_list_adn(item) {
         }
         if (add_to_list) {
           to_watch_list.push(elem);
+          store_to_watch_list();
 
-          chrome.storage.sync.set({
-            'to_watch_list': to_watch_list
-          }, function() {
-            if (chrome.runtime.lastError) {
-              console.log(chrome.runtime.lastError);
-            } else {
-              chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-              chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
-            }
-          });
         }
 
       }
@@ -491,19 +566,11 @@ function set_to_watch_list_crunchyroll(item) {
             add_to_list = false;
           }
         }
-        if (add_to_list) 
+        if (add_to_list) {
           to_watch_list.push(elem);
-        
-        chrome.storage.sync.set({
-          'to_watch_list': to_watch_list
-        }, function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-            chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
-          }
-        });
+          store_to_watch_list();
+
+        }
       }
 
     });
@@ -531,19 +598,11 @@ function set_to_watch_list_wakanim(item) {
           if (to_watch_list[j].title == elem.title) 
             add_to_list = false;
           }
-        if (add_to_list) 
+        if (add_to_list) {
           to_watch_list.push(elem);
-        
-        chrome.storage.sync.set({
-          'to_watch_list': to_watch_list
-        }, function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-            chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
-          }
-        });
+          store_to_watch_list();
+
+        }
 
       }
     }
@@ -601,9 +660,10 @@ chrome.runtime.onInstalled.addListener(function() {
       console.log(chrome.runtime.lastError);
     else {
 
-      if (result.to_watch_list) 
+      if (result.to_watch_list) {
         to_watch_list = result.to_watch_list;
-      
+      }
+
       if (result.last_ep_wakanim) 
         last_ep_wakanim = result.last_ep_wakanim;
       
