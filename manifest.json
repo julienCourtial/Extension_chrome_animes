@@ -4,7 +4,7 @@
   "description": "Build an Extension!",
   "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {
-    "scripts": ["jquery-3.3.1.min.js","background.js"],
+    "scripts": ["jquery-3.3.1.min.js","sizeof.js", "background.js"],
     "persistent": true
   },
   "browser_action": {
