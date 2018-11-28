@@ -19,6 +19,16 @@ function callback() {
     console.log(chrome.runtime.lastError);
   }
 
+function callback_to_watch_list() {
+  if (chrome.runtime.lastError) {
+    console.log(chrome.runtime.lastError);
+  } else {
+    chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
+    chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+  }
+
+}
+
 function store_watching_anime_list(watching_anime_list) {
   let nb = sizeof(watching_anime_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nb > 3) {
@@ -108,51 +118,65 @@ function store_to_watch_list() {
   let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nb > 3) {
     let div = Math.floor(to_watch_list.length / 4);
-    chrome.storage.sync.set({
-      'nb_to_watch_list': 4,
-      'to_watch_list1': to_watch_list.slice(0, div),
-      'to_watch_list2': to_watch_list.slice(div, 2 * div),
-      'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
-      'to_watch_list4': to_watch_list.slice(3 * div, 4 * div)
-    }, callback());
     if (4 * div < to_watch_list.length) {
       chrome.storage.sync.set({
         'nb_to_watch_list': 5,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div),
+        'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
+        'to_watch_list4': to_watch_list.slice(3 * div, 4 * div),
         'to_watch_list5': to_watch_list.slice(4 * div, to_watch_list.length)
-      }, callback());
+      }, callback_to_watch_list());
+    } else {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 4,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div),
+        'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
+        'to_watch_list4': to_watch_list.slice(3 * div, 4 * div)
+      }, callback_to_watch_list());
     }
   } else if (nb > 2) {
     let div = Math.floor(to_watch_list.length / 3);
-    chrome.storage.sync.set({
-      'nb_to_watch_list': 3,
-      'to_watch_list1': to_watch_list.slice(0, div),
-      'to_watch_list2': to_watch_list.slice(div, 2 * div),
-      'to_watch_list3': to_watch_list.slice(2 * div, 3 * div)
-    }, callback());
     if (3 * div < to_watch_list.length) {
       chrome.storage.sync.set({
         'nb_to_watch_list': 4,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div),
+        'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
         'to_watch_list4': to_watch_list.slice(3 * div, to_watch_list.length)
-      }, callback());
+      }, callback_to_watch_list());
+    } else {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 3,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div),
+        'to_watch_list3': to_watch_list.slice(2 * div, 3 * div)
+      }, callback_to_watch_list());
     }
+
   } else if (nb > 1) {
     let div = Math.floor(to_watch_list.length / 2);
-    chrome.storage.sync.set({
-      'nb_to_watch_list': 2,
-      'to_watch_list1': to_watch_list.slice(0, div),
-      'to_watch_list2': to_watch_list.slice(div, 2 * div)
-    }, callback());
     if (2 * div < to_watch_list.length) {
       chrome.storage.sync.set({
         'nb_to_watch_list': 3,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, to_watch_list.length)
-      }, callback());
+      }, callback_to_watch_list());
+    } else {
+      chrome.storage.sync.set({
+        'nb_to_watch_list': 2,
+        'to_watch_list1': to_watch_list.slice(0, div),
+        'to_watch_list2': to_watch_list.slice(div, 2 * div)
+      }, callback_to_watch_list());
     }
+
   } else {
     chrome.storage.sync.set({
       'nb_to_watch_list': 1,
       'to_watch_list1': to_watch_list
-    }, callback());
+    }, callback_to_watch_list());
   }
 }
 
@@ -183,6 +207,9 @@ function retrieve_to_watch_list() {
       if (result.nb_to_watch_list >= 5) {
         to_watch_list = to_watch_list.concat(result.to_watch_list5);
       }
+
+      chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
+      chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
     }
   });
 }
@@ -653,8 +680,9 @@ chrome.runtime.onInstalled.addListener(function() {
   console.log("OnInstalled");
   // chrome.storage.sync.clear();
   retrieve_watching_anime_list();
+  retrieve_to_watch_list();
   chrome.storage.sync.get([
-    "to_watch_list", "last_ep_wakanim", "last_ep_adn", "last_ep_crunchyroll"
+    "last_ep_wakanim", "last_ep_adn", "last_ep_crunchyroll"
   ], function(result) {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
@@ -672,11 +700,9 @@ chrome.runtime.onInstalled.addListener(function() {
       
       if (result.last_ep_crunchyroll) 
         last_ep_crunchyroll = result.last_ep_crunchyroll;
-      
-      chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-      chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
-    }
 
+      }
+    
     startup();
     running = true;
   });
@@ -687,8 +713,9 @@ chrome.runtime.onInstalled.addListener(function() {
 chrome.runtime.onStartup.addListener(function() {
   console.log("OnStartup");
   retrieve_watching_anime_list();
+  retrieve_to_watch_list();
   chrome.storage.sync.get([
-    "to_watch_list", "last_ep_adn", "last_ep_crunchyroll", "last_ep_wakanim"
+    "last_ep_adn", "last_ep_crunchyroll", "last_ep_wakanim"
   ], function(result) {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
@@ -706,8 +733,6 @@ chrome.runtime.onStartup.addListener(function() {
         last_ep_crunchyroll = result.last_ep_crunchyroll;
       
       running = true;
-      chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-      chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
       startup();
     }
   });
@@ -747,6 +772,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
   }
 });
 
+//TODO refaire
 chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.to_watch_list && changes.to_watch_list.newValue) {
     if (changes.to_watch_list.oldValue) {
