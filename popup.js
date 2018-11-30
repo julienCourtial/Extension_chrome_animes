@@ -11,13 +11,6 @@ $(document).ready(function() {
   $('.fixed-action-btn').floatingActionButton();
 });
 
-$("#refresh")[0].onclick = function() {
-  console.log("sending message");
-  chrome.runtime.sendMessage({
-    request: "refreshWatching"
-  }, function(response) {});
-};
-
 function store_to_watch_list(to_watch_list) {
   console.log("storing to watch list");
   let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
@@ -134,9 +127,8 @@ function store_to_watch_list(to_watch_list) {
   }
 }
 
-function display_to_watch_list() {
+function display_to_watch_list(card) {
 
-  let card = document.querySelector("#card_anime");
   var list_episode = $("#list_episode");
   // list_episode[0].childNodes.forEach(function(elem) {
   //   elem.remove;
@@ -206,8 +198,7 @@ function display_to_watch_list() {
 }
 
 //TODO take card as argument
-function display_watching_list() {
-  let card = document.querySelector("#card_watching");
+function display_watching_list(card) {
   var div = $("#watching_list");
 
   chrome.storage.sync.get([
@@ -257,25 +248,62 @@ function display_watching_list() {
 
         div.append(clone);
       });
+      $("#refresh")[0].style.visibility = "visible";
+      $("#refresh")[0].onclick = function() {
+        console.log("sending message");
+        chrome.runtime.sendMessage({
+          request: "refreshWatching"
+        }, function(response) {});
+      };
+      $("#change_pseudo")[0].style.visibility = "visible";
+      $("#change_pseudo")[0].onclick = function() {
+        chrome.storage.sync.remove("name_nautiljon");
+        $("#watching_list")[0].textContent = "";
+        let card_display = document.querySelector("#form_nautiljon");
+        display_form_nautiljon(card_display);
+      };
     }
   });
 
 }
 
+function display_form_nautiljon(card) {
+  var div = $("#watching_list");
+  div.append(document.importNode(card.content, true));
+  $("#refresh")[0].style.visibility = "hidden";
+  $("#change_pseudo")[0].style.visibility = "hidden";
+  $("#start_button")[0].onclick = function() {
+    chrome.runtime.sendMessage({
+      request: "settingNautiljon", pseudo: $("#pseudo")[0].value
+    }, function(response) {
+      console.log(response);
+    });
+  };
+}
+
 var card = document.querySelector("#card_anime");
 display_to_watch_list(card);
-card = document.querySelector("#card_watching");
-display_watching_list(card);
+chrome.storage.sync.get(["name_nautiljon"], function(result) {
+  if (result.name_nautiljon) {
+    card = document.querySelector("#card_watching");
+    display_watching_list(card);
+  } else {
+    card = document.querySelector("#form_nautiljon");
+    display_form_nautiljon(card);
+  }
+});
 
 chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5) {
     console.log(changes);
     $("#list_episode")[0].textContent = "";
-    display_to_watch_list();
+    let card_display = document.querySelector("#card_anime");
+    display_to_watch_list(card_display);
 
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     $("#watching_list")[0].textContent = "";
-    display_watching_list();
+    let card_display = document.querySelector("#card_watching");
+    display_watching_list(card_display);
   }
   // window.location.reload();
 });
