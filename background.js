@@ -16,7 +16,7 @@ let notification_links = [];
 let running;
 
 function callback() {
-  if (chrome.runtime.lastError) 
+  if (chrome.runtime.lastError)
     console.log(chrome.runtime.lastError);
   }
 
@@ -108,7 +108,7 @@ function retrieve_watching_anime_list() {
     "watching_anime_list4",
     "watching_anime_list5"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
       if (result.nb_watching_anime_list >= 1) {
@@ -198,6 +198,7 @@ function store_to_watch_list() {
 }
 
 function retrieve_to_watch_list() {
+  to_watch_list=[];
   chrome.storage.sync.get([
     "nb_to_watch_list",
     "to_watch_list1",
@@ -206,7 +207,7 @@ function retrieve_to_watch_list() {
     "to_watch_list4",
     "to_watch_list5"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
       if (result.nb_to_watch_list >= 1) {
@@ -299,7 +300,7 @@ function set_watching_anime_list_nautiljon(fonction) {
               }
 
               let synopsis = $(data2).find(".description")[0].textContent;
-              if (synopsis.length > 300) 
+              if (synopsis.length > 300)
                 synopsis = synopsis.substring(0, 300) + "...";
               var item = {
                 title: animes[0].childNodes[0].text,
@@ -313,10 +314,10 @@ function set_watching_anime_list_nautiljon(fonction) {
               var add_to_list = true;
 
               for (var i = 0; i < watching_anime_list.length; i++) {
-                if (watching_anime_list[i].title == item.title) 
+                if (watching_anime_list[i].title == item.title)
                   add_to_list = false;
                 }
-              
+
               if (add_to_list) {
                 watching_anime_list.push(item);
                 watching_anime_list.sort(function(a, b) {
@@ -344,7 +345,7 @@ function set_adn_list() {
   if (last_ep_adn) {
     var after_last = false;
     for (var i = adn_list.length - 1; i >= 0; i--) {
-      if (after_last) 
+      if (after_last)
         adn_list.splice(i, 1);
       else if (adn_list[i].title == last_ep_adn.title) {
         after_last = true;
@@ -405,7 +406,7 @@ function set_crunchyroll_list() {
   if (last_ep_crunchyroll) {
     var after_last = false;
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
-      if (after_last) 
+      if (after_last)
         crunchyroll_list.splice(i, 1);
       else if (crunchyroll_list[i].title == last_ep_crunchyroll.title) {
         after_last = true;
@@ -475,7 +476,7 @@ function set_wakanim_list() {
   if (last_ep_wakanim) {
     var after_last = false;
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
-      if (after_last) 
+      if (after_last)
         wakanim_list.splice(i, 1);
       else if (wakanim_list[i].title == last_ep_wakanim.title) {
         after_last = true;
@@ -573,9 +574,9 @@ function set_to_watch_list_adn(item) {
   if (adn_list) {
 
     var titles = item.title.toLowerCase();
-    if (item.title_alt) 
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
-    
+
     adn_list.forEach(function(elem) {
       var true_title = elem.title.split(" Épisode")[0].toLowerCase();
       true_title = true_title.replace("’", "'");
@@ -612,9 +613,9 @@ function set_to_watch_list_crunchyroll(item) {
   if (crunchyroll_list) {
 
     var titles = item.title.toLowerCase()
-    if (titles.includes("(")) 
+    if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (item.title_alt) 
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     crunchyroll_list.forEach(function(elem) {
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
@@ -648,20 +649,20 @@ function set_to_watch_list_wakanim(item) {
   if (wakanim_list) {
 
     var titles = item.title.toLowerCase()
-    if (titles.includes("(")) 
+    if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    
-    if (item.title_alt) 
+
+    if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       elem = wakanim_list[i];
       var true_title = elem.title;
-      if (true_title.includes("-")) 
+      if (true_title.includes("-"))
         true_title = true_title.split(" -")[0];
       if (titles.includes(true_title.split(" Saison")[0].toLowerCase()) || titles.includes(true_title.split(" Arc")[0].toLowerCase())) {
         var add_to_list = true;
         for (var j = 0; j < to_watch_list.length; j++) {
-          if (to_watch_list[j].title == elem.title) 
+          if (to_watch_list[j].title == elem.title)
             add_to_list = false;
           }
         if (add_to_list) {
@@ -731,23 +732,23 @@ chrome.runtime.onInstalled.addListener(function() {
   chrome.storage.sync.get([
     "name_nautiljon", "last_ep_wakanim", "last_ep_adn", "last_ep_crunchyroll"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
-      if (result.name_nautiljon) 
+      if (result.name_nautiljon)
         name_nautiljon = result.name_nautiljon;
-      
-      if (result.last_ep_wakanim) 
+
+      if (result.last_ep_wakanim)
         last_ep_wakanim = result.last_ep_wakanim;
-      
-      if (result.last_ep_adn) 
+
+      if (result.last_ep_adn)
         last_ep_adn = result.last_ep_adn;
-      
-      if (result.last_ep_crunchyroll) 
+
+      if (result.last_ep_crunchyroll)
         last_ep_crunchyroll = result.last_ep_crunchyroll;
 
       }
-    
+
     startup();
     running = true;
   });
@@ -762,21 +763,21 @@ chrome.runtime.onStartup.addListener(function() {
   chrome.storage.sync.get([
     "name_nautiljon", "last_ep_adn", "last_ep_crunchyroll", "last_ep_wakanim"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
-      if (result.name_nautiljon) 
+      if (result.name_nautiljon)
         name_nautiljon = result.name_nautiljon;
-      
-      if (result.last_ep_wakanim) 
+
+      if (result.last_ep_wakanim)
         last_ep_wakanim = result.last_ep_wakanim;
-      
-      if (result.last_ep_adn) 
+
+      if (result.last_ep_adn)
         last_ep_adn = result.last_ep_adn;
-      
-      if (result.last_ep_crunchyroll) 
+
+      if (result.last_ep_crunchyroll)
         last_ep_crunchyroll = result.last_ep_crunchyroll;
-      
+
       running = true;
       startup();
     }
@@ -791,22 +792,22 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
       chrome.storage.sync.get([
         "to_watch_list", "last_ep_adn", "last_ep_crunchyroll", "last_ep_wakanim"
       ], function(result) {
-        if (chrome.runtime.lastError) 
+        if (chrome.runtime.lastError)
           console.log(chrome.runtime.lastError);
         else {
 
-          if (result.to_watch_list) 
+          if (result.to_watch_list)
             to_watch_list = result.to_watch_list;
-          
-          if (result.last_ep_wakanim) 
+
+          if (result.last_ep_wakanim)
             last_ep_wakanim = result.last_ep_wakanim;
-          
-          if (result.last_ep_adn) 
+
+          if (result.last_ep_adn)
             last_ep_adn = result.last_ep_adn;
-          
-          if (result.last_ep_crunchyroll) 
+
+          if (result.last_ep_crunchyroll)
             last_ep_crunchyroll = result.last_ep_crunchyroll;
-          
+
           running = true;
           chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
           chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
@@ -817,6 +818,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
   }
 });
 
+
+chrome.storage.onChanged.addListener(function(changes,areaName){
+  if(changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5){
+    retrieve_to_watch_list();
+  }
+})
 //TODO refaire
 // chrome.storage.onChanged.addListener(function(changes, areaName) {
 //   if (changes.to_watch_list && changes.to_watch_list.newValue) {
