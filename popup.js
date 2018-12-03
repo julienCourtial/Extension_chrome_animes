@@ -231,13 +231,14 @@ function display_watching_list(card) {
       }
 
       watching_anime_list.forEach(function(elem) {
-
         var clone = document.importNode(card.content, true);
         var img = clone.querySelector("img");
         if (elem.image) 
           img.setAttribute("src", elem.image);
         var title = clone.querySelector(".card-title");
         title.textContent = elem.title;
+        var last_ep = clone.querySelector("#last_ep");
+        last_ep.textContent = "Dernier épisode sorti : " + elem.last_ep_notify;
         var description = clone.querySelector(".description");
         description.textContent = elem.description;
 
