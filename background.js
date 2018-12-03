@@ -198,7 +198,6 @@ function store_to_watch_list() {
 }
 
 function retrieve_to_watch_list() {
-  to_watch_list=[];
   chrome.storage.sync.get([
     "nb_to_watch_list",
     "to_watch_list1",
@@ -210,6 +209,7 @@ function retrieve_to_watch_list() {
     if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
+      to_watch_list=[];
       if (result.nb_to_watch_list >= 1) {
         to_watch_list = to_watch_list.concat(result.to_watch_list1);
       }
