@@ -238,7 +238,7 @@ function retrieve_to_watch_list() {
 //TODO remove item in list when not on nautiljon anymore
 function set_watching_anime_list_nautiljon(fonction) {
   console.log("calculating watching list");
-  watching_anime_list = [];
+  // watching_anime_list = [];
   chrome.storage.sync.get(["name_nautiljon"], function(result) {
     if (result.name_nautiljon) {
       $.get("https://www.nautiljon.com/membre/vu," + result.name_nautiljon + ",anime.html?format=&statut=1", function(data) {
