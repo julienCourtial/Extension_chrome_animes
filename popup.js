@@ -230,39 +230,44 @@ function display_watching_list(card) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list5);
       }
 
-      watching_anime_list.forEach(function(elem) {
-        var clone = document.importNode(card.content, true);
-        var img = clone.querySelector("img");
-        if (elem.image) 
-          img.setAttribute("src", elem.image);
-        var title = clone.querySelector(".card-title");
-        title.textContent = elem.title;
-        var last_ep = clone.querySelector("#last_ep");
-        last_ep.textContent = "Dernier épisode sorti : " + elem.last_ep_notify;
-        var description = clone.querySelector(".description");
-        description.textContent = elem.description;
+      if (watching_anime_list.length == 0) {
+        div.textContent == "Aller dans la page 'Vos séries' pour paramétrer l'extension puis attendez qu'un épisode sorte ;)"
+      } else {
 
-        var more = clone.querySelector(".more");
-        more.onclick = function() {
-          chrome.tabs.create({'url': elem.link});
-        }
+        watching_anime_list.forEach(function(elem) {
+          var clone = document.importNode(card.content, true);
+          var img = clone.querySelector("img");
+          if (elem.image) 
+            img.setAttribute("src", elem.image);
+          var title = clone.querySelector(".card-title");
+          title.textContent = elem.title;
+          var last_ep = clone.querySelector("#last_ep");
+          last_ep.textContent = "Dernier épisode sorti : " + elem.last_ep_notify;
+          var description = clone.querySelector(".description");
+          description.textContent = elem.description;
 
-        div.append(clone);
-      });
-      $("#refresh")[0].style.visibility = "visible";
-      $("#refresh")[0].onclick = function() {
-        console.log("sending message");
-        chrome.runtime.sendMessage({
-          request: "refreshWatching"
-        }, function(response) {});
-      };
-      $("#change_pseudo")[0].style.visibility = "visible";
-      $("#change_pseudo")[0].onclick = function() {
-        chrome.storage.sync.remove("name_nautiljon");
-        $("#watching_list")[0].textContent = "";
-        let card_display = document.querySelector("#form_nautiljon");
-        display_form_nautiljon(card_display);
-      };
+          var more = clone.querySelector(".more");
+          more.onclick = function() {
+            chrome.tabs.create({'url': elem.link});
+          }
+
+          div.append(clone);
+        });
+        $("#refresh")[0].style.visibility = "visible";
+        $("#refresh")[0].onclick = function() {
+          console.log("sending message");
+          chrome.runtime.sendMessage({
+            request: "refreshWatching"
+          }, function(response) {});
+        };
+        $("#change_pseudo")[0].style.visibility = "visible";
+        $("#change_pseudo")[0].onclick = function() {
+          chrome.storage.sync.remove("name_nautiljon");
+          $("#watching_list")[0].textContent = "";
+          let card_display = document.querySelector("#form_nautiljon");
+          display_form_nautiljon(card_display);
+        };
+      }
     }
   });
 

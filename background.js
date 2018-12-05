@@ -31,7 +31,6 @@ function store_watching_anime_list(watching_anime_list) {
   console.log("storing watching list")
   let nb = sizeof(watching_anime_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nb > 3) {
-    console.log("watching_anime_list size of 4");
     let div = Math.floor(watching_anime_list.length / 4);
     if (4 * div < watching_anime_list.length) {
       chrome.storage.sync.set({
@@ -53,7 +52,6 @@ function store_watching_anime_list(watching_anime_list) {
     }
 
   } else if (nb > 2) {
-    console.log("watching_anime_list size of 3");
     let div = Math.floor(watching_anime_list.length / 3);
     if (3 * div < watching_anime_list.length) {
       chrome.storage.sync.set({
@@ -73,7 +71,6 @@ function store_watching_anime_list(watching_anime_list) {
     }
 
   } else if (nb > 1) {
-    console.log("watching_anime_list size of 2");
     let div = Math.floor(watching_anime_list.length / 2);
     if (2 * div < watching_anime_list.length) {
       chrome.storage.sync.set({
@@ -91,7 +88,6 @@ function store_watching_anime_list(watching_anime_list) {
     }
 
   } else {
-    console.log("watching_anime_list size of 1");
     chrome.storage.sync.set({
       'nb_watching_anime_list': 1,
       'watching_anime_list1': watching_anime_list
@@ -238,7 +234,6 @@ function retrieve_to_watch_list() {
 //TODO remove item in list when not on nautiljon anymore
 function set_watching_anime_list_nautiljon(fonction) {
   console.log("calculating watching list");
-  watching_anime_list = [];
   chrome.storage.sync.get(["name_nautiljon"], function(result) {
     if (result.name_nautiljon) {
       $.get("https://www.nautiljon.com/membre/vu," + result.name_nautiljon + ",anime.html?format=&statut=1", function(data) {
@@ -315,7 +310,7 @@ function set_watching_anime_list_nautiljon(fonction) {
               }
               var add_to_list = true;
 
-              for (var i = 0; i < watching_anime_list.length; i++) {
+              for (var i = 0; add_to_list && i < watching_anime_list.length; i++) {
                 if (watching_anime_list[i].title == item.title) 
                   add_to_list = false;
                 }
@@ -467,12 +462,7 @@ function set_to_watch_list_adn(item) {
       var true_title = elem.title.split(" Épisode")[0].toLowerCase();
       true_title = true_title.replace("’", "'");
       let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
-      console.log(titles);
-      console.log(true_title);
       if (titles.includes(true_title)) {
-        console.log(item.last_ep_notify);
-        console.log(num_ep);
-        console.log(item.last_ep_notify < num_ep);
         if (item.last_ep_notify < num_ep) {
           item.last_ep_notify = num_ep;
           to_watch_list.push(elem);
