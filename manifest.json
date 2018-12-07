@@ -1,7 +1,7 @@
 {
   "name": "Anime Now",
   "version": "1.1.0",
-  "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
+  "description": "Soyez notifié quand un épisode de vos séries animés favoris sort",
   "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {
     "scripts": ["jquery-3.3.1.min.js","sizeof.js", "background.js"],
