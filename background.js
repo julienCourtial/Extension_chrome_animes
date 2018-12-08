@@ -108,6 +108,7 @@ function retrieve_watching_anime_list() {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
     else {
+      watching_anime_list = [];
       if (result.nb_watching_anime_list >= 1) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list1);
       }
