@@ -287,13 +287,14 @@ function display_form_nautiljon(card) {
   };
 }
 
-var card = document.querySelector("#card_anime");
-display_to_watch_list(card);
 chrome.storage.sync.get(["name_nautiljon"], function(result) {
   if (result.name_nautiljon) {
+    var card = document.querySelector("#card_anime");
+    display_to_watch_list(card);
     card = document.querySelector("#card_watching");
     display_watching_list(card);
   } else {
+    $("#list_episode")[0].textContent = "Allez dans l'onglet VOS SERIES, ajoutez votre pseudo nautiljon et patientez !";
     card = document.querySelector("#form_nautiljon");
     display_form_nautiljon(card);
   }
