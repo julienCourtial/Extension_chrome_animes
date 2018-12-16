@@ -653,6 +653,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5) {
     retrieve_to_watch_list();
+    retrieve_watching_anime_list();
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     retrieve_watching_anime_list();
   }
