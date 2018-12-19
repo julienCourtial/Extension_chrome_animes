@@ -265,7 +265,7 @@ function retrieve_to_watch_list() {
         let last_index = to_watch_list.findIndex(function(elem) {
           return elem.title == last_elem.title;
         });
-        for (let i = last_index; i < to_watch_list.length; i++) {
+        for (let i = last_index + 1; i < to_watch_list.length; i++) {
           createNotif(to_watch_list[i]);
         }
       }
