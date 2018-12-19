@@ -8,6 +8,7 @@ let crunchyroll_list = [];
 let wakanim_list = [];
 
 let to_watch_list = [];
+let old_to_watch = [];
 
 let notification_links = [];
 let running;
@@ -25,6 +26,37 @@ function callback_to_watch_list() {
     chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
   }
 
+}
+
+function createNotif(elem) {
+  if (elem.from == "ADN") {
+    chrome.notifications.create({
+      "type": "basic",
+      "iconUrl": "images/adn.png",
+      "title": elem.title,
+      "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
+    }, function push_notif(notificationId) {
+      notification_links.push({id: notificationId, url: elem.link});
+    });
+  } else if (elem.from == "Crunchyroll") {
+    chrome.notifications.create({
+      "type": "basic",
+      "iconUrl": "images/crunchyroll.png",
+      "title": elem.title,
+      "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Crunchyroll!"
+    }, function push_notif(notificationId) {
+      notification_links.push({id: notificationId, url: elem.link});
+    });
+  } else if (elem.from == "Wakanim") {
+    chrome.notifications.create({
+      "type": "basic",
+      "iconUrl": "images/wakanim.jpg",
+      "title": elem.title,
+      "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Wakanim!"
+    }, function push_notif(notificationId) {
+      notification_links.push({id: notificationId, url: elem.link});
+    });
+  }
 }
 
 function store_watching_anime_list(watching_anime_list) {
@@ -207,6 +239,7 @@ function retrieve_to_watch_list() {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
     else {
+      old_to_watch = to_watch_list;
       to_watch_list = [];
       if (result.nb_to_watch_list >= 1) {
         to_watch_list = to_watch_list.concat(result.to_watch_list1);
@@ -226,6 +259,17 @@ function retrieve_to_watch_list() {
 
       chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
       chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+
+      if (old_to_watch.length != 0) {
+        let last_elem = old_to_watch[old_to_watch.length - 1];
+        let last_index = to_watch_list.findIndex(function(elem) {
+          return elem.title == last_elem.title;
+        });
+        for (let i = last_index; i < to_watch_list.length; i++) {
+          createNotif(to_watch_list[i]);
+        }
+      }
+
     }
   });
 }
@@ -234,7 +278,6 @@ function retrieve_to_watch_list() {
 //TODO ne pas construire item avant de verifier s'il sera a ajouter
 //TODO remove item in list when not on nautiljon anymore
 function set_watching_anime_list_nautiljon(fonction) {
-  console.log("calculating watching list");
   chrome.storage.sync.get(["name_nautiljon"], function(result) {
     if (result.name_nautiljon) {
       $.get("https://www.nautiljon.com/membre/vu," + result.name_nautiljon + ",anime.html?format=&statut=1", function(data) {
@@ -448,14 +491,7 @@ function set_to_watch_list_adn(item) {
           if (item.last_ep_notify < num_ep) {
             item.last_ep_notify = num_ep;
             to_watch_list.push(elem);
-            chrome.notifications.create({
-              "type": "basic",
-              "iconUrl": "images/adn.png",
-              "title": elem.title,
-              "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
-            }, function push_notif(notificationId) {
-              notification_links.push({id: notificationId, url: elem.link});
-            });
+            createNotif(elem);
             store_to_watch_list();
             store_watching_anime_list(watching_anime_list);
           }
@@ -479,14 +515,7 @@ function set_to_watch_list_crunchyroll(item) {
         if (item.last_ep_notify < num_ep) {
           item.last_ep_notify = num_ep;
           to_watch_list.push(elem);
-          chrome.notifications.create({
-            "type": "basic",
-            "iconUrl": "images/crunchyroll.png",
-            "title": elem.title,
-            "message": "Un nouvel épisode de " + elem.title.split(' - ')[0] + " est sorti sur Crunchyroll!"
-          }, function push_notif(notificationId) {
-            notification_links.push({id: notificationId, url: elem.link});
-          });
+          createNotif(elem);
           store_to_watch_list();
           store_watching_anime_list(watching_anime_list);
         }
@@ -515,14 +544,7 @@ function set_to_watch_list_wakanim(item) {
           if (item.last_ep_notify < num_ep) {
             item.last_ep_notify = num_ep;
             to_watch_list.push(elem);
-            chrome.notifications.create({
-              "type": "basic",
-              "iconUrl": "images/wakanim.jpg",
-              "title": elem.title,
-              "message": "Un nouvel épisode de " + elem.title.split(' Saison')[0] + " est sorti sur Wakanim!"
-            }, function push_notif(notificationId) {
-              notification_links.push({id: notificationId, url: elem.link});
-            });
+            createNotif(elem);
             store_to_watch_list();
             store_watching_anime_list(watching_anime_list);
           }
