@@ -198,7 +198,8 @@ function display_to_watch_list(card) {
 }
 
 //TODO take card as argument
-function display_watching_list(card) {
+function display_watching_list() {
+  let card = document.querySelector("#card_watching");
   var div = $("#watching_list");
 
   chrome.storage.sync.get([
@@ -229,9 +230,10 @@ function display_watching_list(card) {
       if (result.nb_watching_anime_list >= 5 && result.watching_anime_list5) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list5);
       }
-
+      console.log("ici");
       if (watching_anime_list.length == 0) {
-        div.textContent == "Aller dans la page 'Vos séries' pour paramétrer l'extension puis attendez qu'un épisode sorte ;)"
+        console.log("la");
+        div[0].textContent = "Vous n'avez aucune série dans votre liste nautiljon";
       } else {
 
         watching_anime_list.forEach(function(elem) {
@@ -253,27 +255,28 @@ function display_watching_list(card) {
 
           div.append(clone);
         });
-        $("#refresh")[0].style.visibility = "visible";
-        $("#refresh")[0].onclick = function() {
-          console.log("sending message");
-          chrome.runtime.sendMessage({
-            request: "refreshWatching"
-          }, function(response) {});
-        };
-        $("#change_pseudo")[0].style.visibility = "visible";
-        $("#change_pseudo")[0].onclick = function() {
-          chrome.storage.sync.remove("name_nautiljon");
-          $("#watching_list")[0].textContent = "";
-          let card_display = document.querySelector("#form_nautiljon");
-          display_form_nautiljon(card_display);
-        };
       }
+      $("#refresh")[0].style.visibility = "visible";
+      $("#refresh")[0].onclick = function() {
+        console.log("sending message");
+        chrome.runtime.sendMessage({
+          request: "refreshWatching"
+        }, function(response) {});
+      };
+      $("#change_pseudo")[0].style.visibility = "visible";
+      $("#change_pseudo")[0].onclick = function() {
+        // chrome.storage.sync.remove("name_nautiljon");
+        $("#watching_list")[0].textContent = "";
+        let card_display = document.querySelector("#form_nautiljon");
+        display_form_nautiljon(card_display);
+      };
     }
   });
 
 }
 
 function display_form_nautiljon(card) {
+  console.log("display form nautiljon");
   var div = $("#watching_list");
   div.append(document.importNode(card.content, true));
   $("#refresh")[0].style.visibility = "hidden";
@@ -283,7 +286,13 @@ function display_form_nautiljon(card) {
       request: "settingNautiljon", pseudo: $("#pseudo")[0].value
     }, function(response) {
       console.log(response);
+      // $("#watching_list")[0].textContent = "";
+      // display_watching_list();
     });
+  };
+  $("#cancelButton")[0].onclick = function() {
+    $("#watching_list")[0].textContent = "";
+    display_watching_list();
   };
 }
 
@@ -291,10 +300,12 @@ chrome.storage.sync.get(["name_nautiljon"], function(result) {
   if (result.name_nautiljon) {
     var card = document.querySelector("#card_anime");
     display_to_watch_list(card);
-    card = document.querySelector("#card_watching");
-    display_watching_list(card);
+    display_watching_list();
   } else {
-    $("#list_episode")[0].textContent = "Allez dans l'onglet VOS SERIES, ajoutez votre pseudo nautiljon et patientez !";
+    $("#list_episode")[0].textContent = "";
+    let init = document.querySelector("#start_to_watch");
+    let toAdd = document.importNode(init.content, true);
+    $("#list_episode").append(toAdd);
     card = document.querySelector("#form_nautiljon");
     display_form_nautiljon(card);
   }
@@ -309,8 +320,10 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
 
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     $("#watching_list")[0].textContent = "";
-    let card_display = document.querySelector("#card_watching");
-    display_watching_list(card_display);
+    display_watching_list();
+  } else if (changes.name_nautiljon) {
+    $("#watching_list")[0].textContent = "";
+    display_watching_list();
   }
   // window.location.reload();
 });
