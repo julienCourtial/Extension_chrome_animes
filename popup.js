@@ -127,8 +127,9 @@ function store_to_watch_list(to_watch_list) {
   }
 }
 
-function display_to_watch_list(card) {
+function display_to_watch_list() {
 
+  var card = document.querySelector("#card_anime");
   var list_episode = $("#list_episode");
   // list_episode[0].childNodes.forEach(function(elem) {
   //   elem.remove;
@@ -267,16 +268,15 @@ function display_watching_list() {
       $("#change_pseudo")[0].onclick = function() {
         // chrome.storage.sync.remove("name_nautiljon");
         $("#watching_list")[0].textContent = "";
-        let card_display = document.querySelector("#form_nautiljon");
-        display_form_nautiljon(card_display);
+        display_form_nautiljon();
       };
     }
   });
 
 }
 
-function display_form_nautiljon(card) {
-  console.log("display form nautiljon");
+function display_form_nautiljon() {
+  var card = document.querySelector("#form_nautiljon");
   var div = $("#watching_list");
   div.append(document.importNode(card.content, true));
   $("#refresh")[0].style.visibility = "hidden";
@@ -298,16 +298,14 @@ function display_form_nautiljon(card) {
 
 chrome.storage.sync.get(["name_nautiljon"], function(result) {
   if (result.name_nautiljon) {
-    var card = document.querySelector("#card_anime");
-    display_to_watch_list(card);
+    display_to_watch_list();
     display_watching_list();
   } else {
     $("#list_episode")[0].textContent = "";
     let init = document.querySelector("#start_to_watch");
     let toAdd = document.importNode(init.content, true);
     $("#list_episode").append(toAdd);
-    card = document.querySelector("#form_nautiljon");
-    display_form_nautiljon(card);
+    display_form_nautiljon();
   }
 });
 
@@ -315,8 +313,7 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5) {
     console.log(changes);
     $("#list_episode")[0].textContent = "";
-    let card_display = document.querySelector("#card_anime");
-    display_to_watch_list(card_display);
+    display_to_watch_list();
 
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     $("#watching_list")[0].textContent = "";
