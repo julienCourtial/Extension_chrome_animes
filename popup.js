@@ -28,8 +28,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     } else {
@@ -43,8 +47,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     }
@@ -61,8 +69,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     } else {
@@ -75,8 +87,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     }
@@ -93,8 +109,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     } else {
@@ -106,8 +126,12 @@ function store_to_watch_list(to_watch_list) {
         if (chrome.runtime.lastError) {
           console.log(chrome.runtime.lastError);
         } else {
-          chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-          chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+          chrome.browserAction.setBadgeText({
+            text: to_watch_list.length.toString()
+          });
+          chrome.browserAction.setBadgeBackgroundColor({
+            color: '#4688F1'
+          });
         }
       });
     }
@@ -120,8 +144,12 @@ function store_to_watch_list(to_watch_list) {
       if (chrome.runtime.lastError) {
         console.log(chrome.runtime.lastError);
       } else {
-        chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
-        chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
+        chrome.browserAction.setBadgeText({
+          text: to_watch_list.length.toString()
+        });
+        chrome.browserAction.setBadgeBackgroundColor({
+          color: '#4688F1'
+        });
       }
     });
   }
@@ -143,7 +171,7 @@ function display_to_watch_list() {
     "to_watch_list4",
     "to_watch_list5"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
       if (result.nb_to_watch_list >= 1) {
@@ -167,12 +195,13 @@ function display_to_watch_list() {
 
         var clone = document.importNode(card.content, true);
         var img = clone.querySelector("img");
-        if (elem.img) 
+        if (elem.img)
           img.setAttribute("src", elem.img);
         var description = clone.querySelector(".description");
         description.textContent = elem.title;
         var remove = clone.querySelector(".remove");
-        remove.onclick = function() {
+        remove.onclick = function(event) {
+          event.preventDefault();
           to_watch_list.forEach(function(e2, index) {
             if (e2.title == elem.title) {
               to_watch_list.splice(index, 1);
@@ -186,7 +215,9 @@ function display_to_watch_list() {
 
         var watch = clone.querySelector(".watch");
         watch.onclick = function() {
-          chrome.tabs.create({'url': elem.link});
+          chrome.tabs.create({
+            'url': elem.link
+          });
         }
 
         list_episode.append(clone);
@@ -198,7 +229,6 @@ function display_to_watch_list() {
 
 }
 
-//TODO take card as argument
 function display_watching_list() {
   let card = document.querySelector("#card_watching");
   var div = $("#watching_list");
@@ -211,7 +241,7 @@ function display_watching_list() {
     "watching_anime_list4",
     "watching_anime_list5"
   ], function(result) {
-    if (chrome.runtime.lastError) 
+    if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
 
@@ -231,16 +261,14 @@ function display_watching_list() {
       if (result.nb_watching_anime_list >= 5 && result.watching_anime_list5) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list5);
       }
-      console.log("ici");
       if (watching_anime_list.length == 0) {
-        console.log("la");
         div[0].textContent = "Vous n'avez aucune série dans votre liste nautiljon";
       } else {
 
         watching_anime_list.forEach(function(elem) {
           var clone = document.importNode(card.content, true);
           var img = clone.querySelector("img");
-          if (elem.image) 
+          if (elem.image)
             img.setAttribute("src", elem.image);
           var title = clone.querySelector(".card-title");
           title.textContent = elem.title;
@@ -251,7 +279,9 @@ function display_watching_list() {
 
           var more = clone.querySelector(".more");
           more.onclick = function() {
-            chrome.tabs.create({'url': elem.link});
+            chrome.tabs.create({
+              'url': elem.link
+            });
           }
 
           div.append(clone);
@@ -283,7 +313,8 @@ function display_form_nautiljon() {
   $("#change_pseudo")[0].style.visibility = "hidden";
   $("#start_button")[0].onclick = function() {
     chrome.runtime.sendMessage({
-      request: "settingNautiljon", pseudo: $("#pseudo")[0].value
+      request: "settingNautiljon",
+      pseudo: $("#pseudo")[0].value
     }, function(response) {
       console.log(response);
       // $("#watching_list")[0].textContent = "";
@@ -311,10 +342,8 @@ chrome.storage.sync.get(["name_nautiljon"], function(result) {
 
 chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5) {
-    console.log(changes);
     $("#list_episode")[0].textContent = "";
     display_to_watch_list();
-
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     $("#watching_list")[0].textContent = "";
     display_watching_list();

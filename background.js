@@ -293,8 +293,6 @@ function retrieve_to_watch_list() {
 }
 
 //TODO a revoir
-//TODO ne pas construire item avant de verifier s'il sera a ajouter
-//TODO remove item in list when not on nautiljon anymore
 function set_watching_anime_list_nautiljon() {
   chrome.storage.sync.get(["name_nautiljon"], function(result) {
     if (result.name_nautiljon) {
