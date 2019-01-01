@@ -73,7 +73,7 @@ function createNotif(elem) {
   }
 }
 
-function store_watching_anime_list(watching_anime_list) {
+function store_watching_anime_list() {
   console.log("storing watching list")
   let nb = sizeof(watching_anime_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nb > 3) {
@@ -311,7 +311,6 @@ function set_watching_anime_list_nautiljon() {
             size++;
           }
         });
-        console.log(size);
         list.each(function() {
 
           var animes = $(this).find("td");
@@ -330,7 +329,7 @@ function set_watching_anime_list_nautiljon() {
                   return a.title.localeCompare(b.title);
                 });
                 if (watching_anime_list.length == size) {
-                  store_watching_anime_list(watching_anime_list);
+                  store_watching_anime_list();
                 }
               }
             }
@@ -401,7 +400,7 @@ function set_watching_anime_list_nautiljon() {
                   return a.title.localeCompare(b.title);
                 });
                 if (watching_anime_list.length == size) {
-                  store_watching_anime_list(watching_anime_list);
+                  store_watching_anime_list();
                 }
 
               });
@@ -538,7 +537,7 @@ function set_to_watch_list_adn(item) {
             to_watch_list.push(elem);
             createNotif(elem);
             store_to_watch_list();
-            store_watching_anime_list(watching_anime_list);
+            store_watching_anime_list();
           }
         }
       }
@@ -562,7 +561,7 @@ function set_to_watch_list_crunchyroll(item) {
           to_watch_list.push(elem);
           createNotif(elem);
           store_to_watch_list();
-          store_watching_anime_list(watching_anime_list);
+          store_watching_anime_list();
         }
       }
     }
@@ -591,7 +590,7 @@ function set_to_watch_list_wakanim(item) {
             to_watch_list.push(elem);
             createNotif(elem);
             store_to_watch_list();
-            store_watching_anime_list(watching_anime_list);
+            store_watching_anime_list();
           }
         }
       }
