@@ -1,8 +1,36 @@
 console.log("COUCOU");
 
+function removeFromList() {
+  chrome.runtime.sendMessage({
+    request: "episodeSeen",
+    url: location.href
+  }, function(response) {});
+
+  if ($("#check_anime")[0] == undefined) {
+    var check = document.createElement("img");
+    check.src = chrome.runtime.getURL("images/check.png");
+    check.id = "check_anime";
+    $("#episodeSeen")[0].append(check);
+  }
+}
+
+function trackPlayer() {
+  let player = $("#adn-video-js_html5_api")[0];
+  if (player == undefined) {
+    setTimeout(trackPlayer, 10000);
+  } else {
+    console.log("PLAYER SET");
+    $(".vjs-dock-bottom")[0].onclick = removeFromList;
+    player.addEventListener('ended', function(event) {
+      removeFromList();
+    });
+  }
+}
+
 chrome.storage.sync.get(["notification_links"], function(result) {
   if (result.notification_links) {
     if (result.notification_links.includes(location.href)) {
+      console.log(result.notification_links);
       var div = $(".share")[0];
 
       var link = document.createElement("a");
@@ -16,23 +44,12 @@ chrome.storage.sync.get(["notification_links"], function(result) {
       link.append(text);
       link.onclick = function(event) {
         event.preventDefault();
-        chrome.runtime.sendMessage({
-          request: "episodeSeen",
-          url: location.href
-        }, function(response) {});
-        let index = result.notification_links.findIndex(function(element) {
-          if (element == location.href) {
-            return true;
-          }
-          return false;
-        });
-        if (index != -1) {
-          result.notification_links.splice(index, 1);
-          chrome.storage.sync.set({"notification_links": result.notification_links});
-        }
-
+        removeFromList();
       };
       div.append(link);
+
+      setTimeout(trackPlayer, 10000);
+
     }
   }
 });

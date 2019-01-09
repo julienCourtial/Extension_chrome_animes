@@ -714,9 +714,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     if (index != -1) {
       to_watch_list.splice(index, 1);
+      store_to_watch_list();
     }
 
-    store_to_watch_list();
+    index = notification_links.findIndex(function(element) {
+      if (element == request.url) {
+        return true;
+      }
+      return false;
+    });
+    if (index != -1) {
+      notification_links.splice(index, 1);
+      chrome.storage.sync.set({"notification_links": notification_links});
+    }
   }
 });
 
