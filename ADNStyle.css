@@ -1,0 +1,16 @@
+#episodeSeen{
+  text-decoration: none;
+  margin-left:5px;
+}
+
+#episodeSeen:hover{
+  filter:brightness(140%);
+}
+
+#episodeSeen img{
+  margin-bottom: -10px;
+}
+
+#episodeSeen span{
+  margin-left: 5px;
+}
