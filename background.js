@@ -12,7 +12,7 @@ let to_watch_list = [];
 let old_to_watch = [];
 
 let notification_links_and_id = [];
-let notification_links = [];
+let links = [];
 let running;
 
 function callback() {
@@ -39,8 +39,6 @@ function createNotif(elem) {
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
     }, function push_notif(notificationId) {
       notification_links_and_id.push({id: notificationId, url: elem.link});
-      notification_links.push(elem.link);
-      chrome.storage.sync.set({"notification_links": notification_links});
     });
   } else if (elem.from == "Crunchyroll") {
     chrome.notifications.create({
@@ -50,8 +48,6 @@ function createNotif(elem) {
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Crunchyroll!"
     }, function push_notif(notificationId) {
       notification_links_and_id.push({id: notificationId, url: elem.link});
-      notification_links.push(elem.link);
-      chrome.storage.sync.set({"notification_links": notification_links});
     });
   } else if (elem.from == "Wakanim") {
     chrome.notifications.create({
@@ -61,8 +57,6 @@ function createNotif(elem) {
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Wakanim!"
     }, function push_notif(notificationId) {
       notification_links_and_id.push({id: notificationId, url: elem.link});
-      notification_links.push(elem.link);
-      chrome.storage.sync.set({"notification_links": notification_links});
     });
   }
 }
@@ -431,7 +425,7 @@ function set_crunchyroll_list() {
       });
       var item = {
         title: $(this).find("title").text(),
-        link: $(this).find("link").text(),
+        link: $(this).find("link").text().replace("http", "https"),
         img: image,
         seriesTitle: seriesTitle,
         from: "Crunchyroll"
@@ -514,6 +508,8 @@ function set_to_watch_list_adn(item) {
             createNotif(elem);
             store_to_watch_list();
             store_watching_anime_list();
+            links.push(elem.link);
+            chrome.storage.sync.set({"links": links});
           }
         }
       }
@@ -538,6 +534,8 @@ function set_to_watch_list_crunchyroll(item) {
           createNotif(elem);
           store_to_watch_list();
           store_watching_anime_list();
+          links.push(elem.link);
+          chrome.storage.sync.set({"links": links});
         }
       }
     }
@@ -567,6 +565,8 @@ function set_to_watch_list_wakanim(item) {
             createNotif(elem);
             store_to_watch_list();
             store_watching_anime_list();
+            links.push(elem.link);
+            chrome.storage.sync.set({"links": links});
           }
         }
       }
@@ -616,7 +616,7 @@ chrome.runtime.onInstalled.addListener(function() {
   retrieve_watching_anime_list();
   retrieve_to_watch_list();
   chrome.storage.sync.get([
-    "name_nautiljon", "notification_links"
+    "name_nautiljon", "links"
   ], function(result) {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
@@ -624,8 +624,8 @@ chrome.runtime.onInstalled.addListener(function() {
       if (result.name_nautiljon) 
         name_nautiljon = result.name_nautiljon;
       }
-    if (result.notification_links) {
-      notification_links = result.notification_links;
+    if (result.links) {
+      links = result.links;
     }
     startup();
     running = true;
@@ -637,7 +637,7 @@ chrome.runtime.onStartup.addListener(function() {
   retrieve_watching_anime_list();
   retrieve_to_watch_list();
   chrome.storage.sync.get([
-    "name_nautiljon", "notification_links"
+    "name_nautiljon", "links"
   ], function(result) {
     if (chrome.runtime.lastError) 
       console.log(chrome.runtime.lastError);
@@ -646,8 +646,8 @@ chrome.runtime.onStartup.addListener(function() {
         name_nautiljon = result.name_nautiljon;
       }
 
-      if (result.notification_links) {
-        notification_links = result.notification_links;
+      if (result.links) {
+        links = result.links;
       }
       running = true;
       startup();
@@ -717,15 +717,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       store_to_watch_list();
     }
 
-    index = notification_links.findIndex(function(element) {
+    index = links.findIndex(function(element) {
       if (element == request.url) {
         return true;
       }
       return false;
     });
     if (index != -1) {
-      notification_links.splice(index, 1);
-      chrome.storage.sync.set({"notification_links": notification_links});
+      links.splice(index, 1);
+      chrome.storage.sync.set({"links": links});
     }
   }
 });
@@ -736,7 +736,7 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
     retrieve_watching_anime_list();
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     retrieve_watching_anime_list();
-  } else if (changes.notification_links) {
-    notification_links = changes.notification_links;
+  } else if (changes.links) {
+    links = changes.links;
   }
 });

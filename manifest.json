@@ -4,11 +4,11 @@
   "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
   "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {
-    "scripts": ["jquery-3.3.1.min.js","sizeof.js", "background.js"],
+    "scripts": ["useful/jquery-3.3.1.min.js","useful/sizeof.js", "background.js"],
     "persistent": true
   },
   "browser_action": {
-    "default_popup": "popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": {
       "16": "images/logo_null16.png",
       "32": "images/logo_null32.png",
@@ -25,8 +25,18 @@
   "content_scripts": [
    {
      "matches": ["https://animedigitalnetwork.fr/*"],
-     "css": ["ADNStyle.css"],
-     "js": ["jquery-3.3.1.min.js","contentScriptADN.js"]
+     "css": ["contentScripts/ADNStyle.css"],
+     "js": ["useful/jquery-3.3.1.min.js","contentScripts/contentScriptADN.js"]
+   },
+   {
+     "matches": ["https://www.crunchyroll.com/*"],
+     "css": ["contentScripts/CrunchyrollStyle.css"],
+     "js": ["useful/jquery-3.3.1.min.js","contentScripts/contentScriptCrunchyroll.js"]
+   },
+   {
+     "matches": ["https://www.wakanim.tv/*"],
+     "css": ["contentScripts/WakanimStyle.css"],
+     "js": ["useful/jquery-3.3.1.min.js","contentScripts/contentScriptWakanim.js"]
    }
  ],
  "web_accessible_resources": [
