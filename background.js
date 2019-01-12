@@ -262,7 +262,7 @@ function retrieve_to_watch_list() {
       chrome.browserAction.setBadgeText({text: to_watch_list.length.toString()});
       chrome.browserAction.setBadgeBackgroundColor({color: '#4688F1'});
 
-      if (old_to_watch.length != 0) {
+      if (old_to_watch.length != 0 && old_to_watch.length < to_watch_list.length) {
         let last_elem = old_to_watch[old_to_watch.length - 1];
         let last_index = to_watch_list.findIndex(function(elem) {
           return elem.title == last_elem.title;
