@@ -3,13 +3,6 @@ function removeFromList() {
     request: "episodeSeen",
     url: location.href
   }, function(response) {});
-
-  // if ($("#check_anime")[0] == undefined) {
-  //   var check = document.createElement("img");
-  //   check.src = chrome.runtime.getURL("images/check.png");
-  //   check.id = "check_anime";
-  //   $("#episodeSeen")[0].append(check);
-  // }
   $("#imgAnimeFR")[0].src = chrome.runtime.getURL("images/check.png");
 }
 
@@ -18,8 +11,7 @@ function trackPlayer() {
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {
-    console.log("PLAYER SET");
-    // $(".vjs-dock-bottom")[0].onclick = removeFromList;
+    $(".episodeNextEp")[0].onclick = removeFromList;
     player.addEventListener('ended', function(event) {
       removeFromList();
     });

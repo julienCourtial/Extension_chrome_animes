@@ -1,5 +1,3 @@
-console.log("COUCOU");
-
 function removeFromList() {
   chrome.runtime.sendMessage({
     request: "episodeSeen",

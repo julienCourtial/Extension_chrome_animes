@@ -1,5 +1,3 @@
-console.log("SALUT");
-
 function removeFromList() {
   chrome.runtime.sendMessage({
     request: "episodeSeen",
@@ -32,8 +30,6 @@ chrome.storage.sync.get(["links"], function(result) {
         removeFromList();
       };
       div.append(link);
-
-      setTimeout(trackPlayer, 10000);
 
     }
 
