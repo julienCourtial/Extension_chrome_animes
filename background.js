@@ -440,9 +440,13 @@ function set_crunchyroll_list() {
           seriesTitle = elem.textContent;
         }
       });
+      let link = $(this).find("link").text().replace("http", "https");
+      if(link.includes('/fr/')){
+        link.replace("www.crunchyroll.com/","www.crunchyroll.com/fr/");
+      }
       var item = {
         title: $(this).find("title").text(),
-        link: $(this).find("link").text().replace("http", "https"),
+        link: link,
         img: image,
         seriesTitle: seriesTitle,
         from: "Crunchyroll"
