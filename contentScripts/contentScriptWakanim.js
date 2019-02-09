@@ -20,7 +20,6 @@ function trackPlayer() {
 
 chrome.storage.sync.get(["links"], function(result) {
   if (result.links) {
-    console.log(result.links);
     if (result.links.includes(location.href)) {
       var div = $(".episodeBtns")[0];
 

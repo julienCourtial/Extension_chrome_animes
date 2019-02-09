@@ -27,7 +27,7 @@ function trackPlayer() {
 
 chrome.storage.sync.get(["links"], function(result) {
   if (result.links) {
-    if (result.links.includes(location.href)) {
+    if (location.href.includes(result.links)) {
       console.log(result.links);
       var div = $(".share")[0];
 
