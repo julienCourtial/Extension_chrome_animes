@@ -1,7 +1,9 @@
+var site;
+
 function removeFromList() {
   chrome.runtime.sendMessage({
     request: "episodeSeen",
-    url: location.href
+    url: site
   }, function(response) {});
 
   if ($("#check_anime")[0] == undefined) {
@@ -17,7 +19,6 @@ function trackPlayer() {
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {
-    console.log("PLAYER SET");
     $(".vjs-dock-bottom")[0].onclick = removeFromList;
     player.addEventListener('ended', function(event) {
       removeFromList();
@@ -28,14 +29,15 @@ function trackPlayer() {
 chrome.storage.sync.get(["links"], function(result) {
   if (result.links) {
     let isLink = false;
-    let site = location.href;
+    site = location.href;
     for (let link of result.links) {
       if (site.includes(link)) {
+        site = link;
         isLink = true;
+        break;
       }
     }
     if (isLink) {
-      console.log(result.links);
       var div = $(".share")[0];
 
       var link = document.createElement("a");

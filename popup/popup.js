@@ -159,9 +159,6 @@ function display_to_watch_list() {
 
   var card = document.querySelector("#card_anime");
   var list_episode = $("#list_episode");
-  // list_episode[0].childNodes.forEach(function(elem) {
-  //   elem.remove;
-  // });
   var to_watch_list = [];
   chrome.storage.sync.get([
     "nb_to_watch_list",
@@ -199,21 +196,16 @@ function display_to_watch_list() {
           img.setAttribute("src", elem.img);
         var description = clone.querySelector(".description");
         description.textContent = elem.title;
-        var remove = clone.querySelector(".remove");
+        var remove = clone.querySelector("#remove");
         remove.onclick = function(event) {
           event.preventDefault();
-          to_watch_list.forEach(function(e2, index) {
-            if (e2.title == elem.title) {
-              to_watch_list.splice(index, 1);
-              to_watch_list.reverse();
-              store_to_watch_list(to_watch_list);
-              to_watch_list.reverse();
-            }
-
-          });
+          chrome.runtime.sendMessage({
+            request: "episodeSeen",
+            url: elem.link
+          }, function(response) {});
         };
 
-        var watch = clone.querySelector(".watch");
+        var watch = clone.querySelector("#watch");
         watch.onclick = function() {
           chrome.tabs.create({
             'url': elem.link
@@ -274,10 +266,10 @@ function display_watching_list() {
           title.textContent = elem.title;
           var last_ep = clone.querySelector("#last_ep");
           last_ep.textContent = "Dernier épisode sorti : " + elem.last_ep_notify;
-          var description = clone.querySelector(".description");
+          var description = clone.querySelector("#description");
           description.textContent = elem.description;
 
-          var more = clone.querySelector(".more");
+          var more = clone.querySelector("#more");
           more.onclick = function() {
             chrome.tabs.create({
               'url': elem.link
