@@ -341,7 +341,7 @@ function set_watching_anime_list_nautiljon() {
               already_in = true;
               watching_anime_list.push(old_watching[i]);
               watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
+                return a.title.synceCompare(b.title);
               });
               if (watching_anime_list.length == size) {
                 store_watching_anime_list();
@@ -412,7 +412,7 @@ function set_watching_anime_list_nautiljon() {
               }
               watching_anime_list.push(item);
               watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
+                return a.title.synceCompare(b.title);
               });
               if (watching_anime_list.length == size) {
                 store_watching_anime_list();
@@ -708,7 +708,7 @@ browser.runtime.onStartup.addListener(function() {
 
   },callback);
 });
-//ADD GET TO EVERY LIST TO SET THEM IN LOCAL AND SET THE LIST IN SYNC WHEN CREATED
+//ADD GET TO EVERY LIST TO SET THEM IN sync AND SET THE LIST IN sync WHEN CREATED
 browser.alarms.onAlarm.addListener(function(alarm) {
   if (alarm.name == "check_running") {
     if (!running) {

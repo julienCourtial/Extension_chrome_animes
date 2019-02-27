@@ -1,3 +1,5 @@
+console.log("CS Crunchy");
+
 function callback(error) {
   console.error(error);
 }

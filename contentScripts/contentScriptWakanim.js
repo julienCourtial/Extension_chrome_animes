@@ -1,3 +1,4 @@
+console.log("CS Waka");
 function callback(error) {
   console.error(error);
 }
