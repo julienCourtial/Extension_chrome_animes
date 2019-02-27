@@ -1,25 +1,40 @@
+// Username of user on nautiljon website
 let name_nautiljon;
+
+// List of anime series the user is currently watching
 let watching_anime_list = [];
 let old_watching = [];
 
+// List of episodes released on ADN
 let adn_list = [];
 
+// List of episodes released on Crunchyroll
 let crunchyroll_list = [];
 
+// List of episodes released on Wakanim
 let wakanim_list = [];
 
+// List of episodes released that the user didn't watch
 let to_watch_list = [];
 let old_to_watch = [];
 
+// List of notifications
 let notification_links_and_id = [];
+
+// List of url of each episode in to_watch_list
 let links = [];
+
+//
 let running;
 
+// Standard callback function
 function callback() {
   if (chrome.runtime.lastError)
     console.log(chrome.runtime.lastError);
 }
 
+// Callback function used when setting to_watch_list
+// Updating the extension badge
 function callback_to_watch_list() {
   if (chrome.runtime.lastError) {
     console.log(chrome.runtime.lastError);
@@ -34,6 +49,8 @@ function callback_to_watch_list() {
 
 }
 
+// Create a notification depending on the website the episodes were released
+//  and add the link and id in the notification_links_and_id list
 function createNotif(elem) {
   if (elem.from == "ADN") {
     chrome.notifications.create({
@@ -74,6 +91,8 @@ function createNotif(elem) {
   }
 }
 
+// Store the watching_anime list by dividing it depending on the list size and
+// the QUOTA BYTES PER ITEM from chrome storage
 function store_watching_anime_list() {
   console.log("storing watching list")
   let nb = sizeof(watching_anime_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
@@ -143,6 +162,7 @@ function store_watching_anime_list() {
 
 }
 
+// Retrieve the watching anime list from each part on the chrome storage
 function retrieve_watching_anime_list() {
   chrome.storage.sync.get([
     "nb_watching_anime_list",
@@ -175,6 +195,9 @@ function retrieve_watching_anime_list() {
   });
 }
 
+
+// Store the to_watch list by dividing it depending on the list size and
+// the QUOTA BYTES PER ITEM from chrome storage
 function store_to_watch_list() {
   console.log("storing to watch list");
   let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
@@ -242,6 +265,8 @@ function store_to_watch_list() {
   }
 }
 
+// Retrieve the to_watch list from each part on the chrome storage and create a
+// notification if there are new epiosodes from another machine
 function retrieve_to_watch_list() {
   chrome.storage.sync.get([
     "nb_to_watch_list",
@@ -279,6 +304,8 @@ function retrieve_to_watch_list() {
         color: '#4688F1'
       });
 
+      //Compare the old list with the new one just retrieved and compare both of
+      // them to see if there are new episodes
       if (old_to_watch.length != 0 && old_to_watch.length < to_watch_list.length) {
         let last_elem = old_to_watch[old_to_watch.length - 1];
         let last_index = to_watch_list.findIndex(function(elem) {
@@ -293,16 +320,20 @@ function retrieve_to_watch_list() {
   });
 }
 
-//TODO a revoir
+// Retrieve the watching_anime list from the user list on the nautiljon website
 function set_watching_anime_list_nautiljon() {
+  // If the user set is nautiljon's username we can retrieve the list
   chrome.storage.sync.get(["name_nautiljon"], function(result) {
     if (result.name_nautiljon) {
+      // Request the page of the user list on nautiljon
       $.get("https://www.nautiljon.com/membre/vu," + result.name_nautiljon + ",anime.html?format=&statut=1", function(data) {
         old_watching = watching_anime_list;
         watching_anime_list = [];
         var animes = [];
         let list = $($(data).find("tbody")[0]).find("tr");
         let size = list.length;
+
+        // Loop on the anime list from page and retrieve everything that is needed
         list.each(function() {
 
           var animes = $(this).find("td");
@@ -398,12 +429,12 @@ function set_watching_anime_list_nautiljon() {
           }
 
         });
-        // });
       });
     }
   })
 }
 
+// Construct the ADN list from the RSS
 function set_adn_list() {
   adn_list = [];
   $.get("https://animedigitalnetwork.fr/rss", function(data) {
@@ -424,6 +455,7 @@ function set_adn_list() {
   })
 }
 
+// Construct the Crunchyroll list from the RSS
 function set_crunchyroll_list() {
   crunchyroll_list = [];
   $.get("https://www.crunchyroll.com/rss?lang=frFR", function(data) {
@@ -456,6 +488,7 @@ function set_crunchyroll_list() {
   });
 }
 
+// Since there is no RSS for Wakanim, construct the list from the front page of Wakanim.
 function set_wakanim_list() {
   wakanim_list = [];
   $.get("https://www.wakanim.tv/fr/v2", function(data) {
@@ -509,11 +542,12 @@ function set_wakanim_list() {
   });
 }
 
-function set_to_watch_list_adn(item) {
+// Look in the ADN list if the serie given has a new episode released
+function set_to_watch_list_adn(serie) {
   if (adn_list) {
-    var titles = item.title.toLowerCase();
-    if (item.title_alt)
-      titles = titles.concat(" /", item.title_alt.toLowerCase());
+    var titles = serie.title.toLowerCase();
+    if (serie.title_alt)
+      titles = titles.concat(" /", serie.title_alt.toLowerCase());
 
     for (var i = adn_list.length - 1; i >= 0; i--) {
       var elem = adn_list[i];
@@ -523,8 +557,8 @@ function set_to_watch_list_adn(item) {
         true_title = true_title.replace("’", "'");
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
         if (titles.includes(true_title)) {
-          if (item.last_ep_notify < num_ep) {
-            item.last_ep_notify = num_ep;
+          if (serie.last_ep_notify < num_ep) {
+            serie.last_ep_notify = num_ep;
             to_watch_list.push(elem);
             createNotif(elem);
             store_to_watch_list();
@@ -540,19 +574,20 @@ function set_to_watch_list_adn(item) {
   }
 }
 
-function set_to_watch_list_crunchyroll(item) {
+// Look in the Crunchyroll list if the serie given has a new episode released
+function set_to_watch_list_crunchyroll(serie) {
   if (crunchyroll_list) {
-    var titles = item.title.toLowerCase();
+    var titles = serie.title.toLowerCase();
     if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (item.title_alt)
-      titles = titles.concat(" /", item.title_alt.toLowerCase());
+    if (serie.title_alt)
+      titles = titles.concat(" /", serie.title_alt.toLowerCase());
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       var elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
-        if (item.last_ep_notify < num_ep) {
-          item.last_ep_notify = num_ep;
+        if (serie.last_ep_notify < num_ep) {
+          serie.last_ep_notify = num_ep;
           to_watch_list.push(elem);
           createNotif(elem);
           store_to_watch_list();
@@ -567,13 +602,14 @@ function set_to_watch_list_crunchyroll(item) {
   }
 }
 
-function set_to_watch_list_wakanim(item) {
+// Look in the Wakanim list if the serie given has a new episode released
+function set_to_watch_list_wakanim(serie) {
   if (wakanim_list) {
-    var titles = item.title.toLowerCase();
+    var titles = serie.title.toLowerCase();
     if (titles.includes("("))
       titles = titles.concat(" / ", titles.split(" (")[0]);
-    if (item.title_alt)
-      titles = titles.concat(" /", item.title_alt.toLowerCase());
+    if (serie.title_alt)
+      titles = titles.concat(" /", serie.title_alt.toLowerCase());
 
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       elem = wakanim_list[i];
@@ -584,8 +620,8 @@ function set_to_watch_list_wakanim(item) {
         if (true_title.includes("-"))
           true_title = true_title.split(" -")[0];
         if (titles.includes(true_title.split(" Saison")[0].toLowerCase()) || titles.includes(true_title.split(" Arc")[0].toLowerCase())) {
-          if (item.last_ep_notify < num_ep) {
-            item.last_ep_notify = num_ep;
+          if (serie.last_ep_notify < num_ep) {
+            serie.last_ep_notify = num_ep;
             to_watch_list.push(elem);
             createNotif(elem);
             store_to_watch_list();
@@ -602,6 +638,8 @@ function set_to_watch_list_wakanim(item) {
   }
 }
 
+// Loop on the watching anime list and call the set to watch function corresponding to the
+//  editor of the anime
 function set_to_watch_list() {
   if (watching_anime_list) {
     for (var i = 0; i < watching_anime_list.length; i++) {
@@ -629,13 +667,10 @@ function set_to_watch_list() {
 }
 
 function startup() {
-  // set_watching_anime_list_nautiljon();
   set_adn_list();
   set_crunchyroll_list();
   set_wakanim_list();
   setTimeout(set_to_watch_list, 60000);
-  // setTimeout(refresh, 300000);
-  // setTimeout(startup, 30000);
   setTimeout(startup, 70000);
 }
 chrome.runtime.onInstalled.addListener(function() {
