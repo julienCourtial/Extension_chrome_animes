@@ -3,5 +3,5 @@
 }
 
 .icon-anime-fr-check:before{
-  content: url('chrome-extension://__MSG_@@extension_id__/images/check16.png');
+  content: url('../images/check16.png');
 }

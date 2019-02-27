@@ -141,7 +141,7 @@ function display_to_watch_list() {
             browser.runtime.sendMessage({
                 request: "episodeSeen",
                 url: elem.link
-              }.then(function(response) {}, callback);
+              }).then(function(response) {}, callback);
             };
 
             var watch = clone.querySelector("#watch");
@@ -221,7 +221,7 @@ function display_to_watch_list() {
           console.log("sending message");
           browser.runtime.sendMessage({
               request: "refreshWatching"
-            }.then(function(response) {}, callback);
+            }).then(function(response) {}, callback);
           };
           $("#change_pseudo")[0].style.visibility = "visible";
           $("#change_pseudo")[0].onclick = function() {
@@ -244,7 +244,7 @@ function display_to_watch_list() {
         browser.runtime.sendMessage({
             request: "settingNautiljon",
             pseudo: $("#pseudo")[0].value
-          }.then(function(response) {
+          }).then(function(response) {
             console.log(response);
             // $("#watching_list")[0].textContent = "";
             // display_watching_list();
