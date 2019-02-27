@@ -28,153 +28,147 @@ let links = [];
 let running;
 
 // Standard callback function
-function callback() {
-  if (chrome.runtime.lastError)
-    console.log(chrome.runtime.lastError);
+function callback(error) {
+    console.error(error);
 }
 
 // Callback function used when setting to_watch_list
 // Updating the extension badge
 function callback_to_watch_list() {
-  if (chrome.runtime.lastError) {
-    console.log(chrome.runtime.lastError);
-  } else {
-    chrome.browserAction.setBadgeText({
+    browser.browserAction.setBadgeText({
       text: to_watch_list.length.toString()
     });
-    chrome.browserAction.setBadgeBackgroundColor({
+    browser.browserAction.setBadgeBackgroundColor({
       color: '#4688F1'
     });
-  }
 
+}
+
+
+function callback_to_watch_list_error(error) {
+    console.error(error);
 }
 
 // Create a notification depending on the website the episodes were released
 //  and add the link and id in the notification_links_and_id list
 function createNotif(elem) {
+  let creating;
   if (elem.from == "ADN") {
-    chrome.notifications.create({
+    creating = browser.notifications.create({
       "type": "basic",
       "iconUrl": "images/adn.png",
       "title": elem.title,
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur ADN!"
-    }, function push_notif(notificationId) {
-      notification_links_and_id.push({
-        id: notificationId,
-        url: elem.link
-      });
     });
+
+
   } else if (elem.from == "Crunchyroll") {
-    chrome.notifications.create({
+    creating = browser.notifications.create({
       "type": "basic",
       "iconUrl": "images/crunchyroll.png",
       "title": elem.title,
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Crunchyroll!"
-    }, function push_notif(notificationId) {
-      notification_links_and_id.push({
-        id: notificationId,
-        url: elem.link
-      });
     });
   } else if (elem.from == "Wakanim") {
-    chrome.notifications.create({
+    creating = browser.notifications.create({
       "type": "basic",
       "iconUrl": "images/wakanim.jpg",
       "title": elem.title,
       "message": "Un nouvel épisode de " + elem.title.split(' Épisode')[0] + " est sorti sur Wakanim!"
-    }, function push_notif(notificationId) {
-      notification_links_and_id.push({
-        id: notificationId,
-        url: elem.link
-      });
     });
   }
+  creating.then(function push_notif(notificationId) {
+    notification_links_and_id.push({
+      id: notificationId,
+      url: elem.link
+    });
+  });
 }
 
 // Store the watching_anime list by dividing it depending on the list size and
-// the QUOTA BYTES PER ITEM from chrome storage
+// the QUOTA BYTES PER ITEM from browser storage
 function store_watching_anime_list() {
   console.log("storing watching list")
-  let nb = sizeof(watching_anime_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
+  let nb = sizeof(watching_anime_list) / browser.storage.sync.QUOTA_BYTES_PER_ITEM;
+  let setting;
   if (nb > 3) {
     let div = Math.floor(watching_anime_list.length / 4);
     if (4 * div < watching_anime_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 5,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div),
         'watching_anime_list3': watching_anime_list.slice(2 * div, 3 * div),
         'watching_anime_list4': watching_anime_list.slice(3 * div, 4 * div),
         'watching_anime_list5': watching_anime_list.slice(4 * div, watching_anime_list.length)
-      }, callback());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 4,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div),
         'watching_anime_list3': watching_anime_list.slice(2 * div, 3 * div),
         'watching_anime_list4': watching_anime_list.slice(3 * div, 4 * div)
-      }, callback());
+      });
     }
 
   } else if (nb > 2) {
     let div = Math.floor(watching_anime_list.length / 3);
     if (3 * div < watching_anime_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 4,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div),
         'watching_anime_list3': watching_anime_list.slice(2 * div, 3 * div),
         'watching_anime_list4': watching_anime_list.slice(3 * div, watching_anime_list.length)
-      }, callback());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 3,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div),
         'watching_anime_list3': watching_anime_list.slice(2 * div, 3 * div)
-      }, callback());
+      });
     }
 
   } else if (nb > 1) {
     let div = Math.floor(watching_anime_list.length / 2);
     if (2 * div < watching_anime_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 3,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div),
         'watching_anime_list3': watching_anime_list.slice(2 * div, watching_anime_list.length)
-      }, callback());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_watching_anime_list': 2,
         'watching_anime_list1': watching_anime_list.slice(0, div),
         'watching_anime_list2': watching_anime_list.slice(div, 2 * div)
-      }, callback());
+      });
     }
 
   } else {
-    chrome.storage.sync.set({
+    setting = browser.storage.sync.set({
       'nb_watching_anime_list': 1,
       'watching_anime_list1': watching_anime_list
-    }, callback());
+    });
   }
+  setting.then(()=>{},callback);
 
 }
 
-// Retrieve the watching anime list from each part on the chrome storage
+// Retrieve the watching anime list from each part on the browser storage
 function retrieve_watching_anime_list() {
-  chrome.storage.sync.get([
+  browser.storage.sync.get([
     "nb_watching_anime_list",
     "watching_anime_list1",
     "watching_anime_list2",
     "watching_anime_list3",
     "watching_anime_list4",
     "watching_anime_list5"
-  ], function(result) {
-    if (chrome.runtime.lastError)
-      console.log(chrome.runtime.lastError);
-    else {
+  ]).then( function(result) {
+
       watching_anime_list = [];
       if (result.nb_watching_anime_list >= 1) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list1);
@@ -191,94 +185,94 @@ function retrieve_watching_anime_list() {
       if (result.nb_watching_anime_list >= 5) {
         watching_anime_list = watching_anime_list.concat(result.watching_anime_list5);
       }
-    }
-  });
+
+  },callback);
 }
 
 
 // Store the to_watch list by dividing it depending on the list size and
-// the QUOTA BYTES PER ITEM from chrome storage
+// the QUOTA BYTES PER ITEM from browser storage
 function store_to_watch_list() {
   console.log("storing to watch list");
-  let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
+  let nb = sizeof(to_watch_list) / browser.storage.sync.QUOTA_BYTES_PER_ITEM;
+  let setting;
   if (nb > 3) {
     let div = Math.floor(to_watch_list.length / 4);
     if (4 * div < to_watch_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 5,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
         'to_watch_list4': to_watch_list.slice(3 * div, 4 * div),
         'to_watch_list5': to_watch_list.slice(4 * div, to_watch_list.length)
-      }, callback_to_watch_list());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 4,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
         'to_watch_list4': to_watch_list.slice(3 * div, 4 * div)
-      }, callback_to_watch_list());
+      });
     }
   } else if (nb > 2) {
     let div = Math.floor(to_watch_list.length / 3);
     if (3 * div < to_watch_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 4,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, 3 * div),
         'to_watch_list4': to_watch_list.slice(3 * div, to_watch_list.length)
-      }, callback_to_watch_list());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 3,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, 3 * div)
-      }, callback_to_watch_list());
+      });
     }
 
   } else if (nb > 1) {
     let div = Math.floor(to_watch_list.length / 2);
     if (2 * div < to_watch_list.length) {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 3,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div),
         'to_watch_list3': to_watch_list.slice(2 * div, to_watch_list.length)
-      }, callback_to_watch_list());
+      });
     } else {
-      chrome.storage.sync.set({
+      setting = browser.storage.sync.set({
         'nb_to_watch_list': 2,
         'to_watch_list1': to_watch_list.slice(0, div),
         'to_watch_list2': to_watch_list.slice(div, 2 * div)
-      }, callback_to_watch_list());
+      });
     }
 
   } else {
-    chrome.storage.sync.set({
+    setting = browser.storage.sync.set({
       'nb_to_watch_list': 1,
       'to_watch_list1': to_watch_list
-    }, callback_to_watch_list());
+    });
   }
+  setting.then(callback_to_watch_list, callback_to_watch_list_error);
 }
 
-// Retrieve the to_watch list from each part on the chrome storage and create a
+// Retrieve the to_watch list from each part on the browser storage and create a
 // notification if there are new epiosodes from another machine
 function retrieve_to_watch_list() {
-  chrome.storage.sync.get([
+  browser.storage.sync.get([
     "nb_to_watch_list",
     "to_watch_list1",
     "to_watch_list2",
     "to_watch_list3",
     "to_watch_list4",
     "to_watch_list5"
-  ], function(result) {
-    if (chrome.runtime.lastError)
-      console.log(chrome.runtime.lastError);
-    else {
+  ]).then(function(result) {
+
       old_to_watch = to_watch_list;
       to_watch_list = [];
       if (result.nb_to_watch_list >= 1) {
@@ -297,10 +291,10 @@ function retrieve_to_watch_list() {
         to_watch_list = to_watch_list.concat(result.to_watch_list5);
       }
 
-      chrome.browserAction.setBadgeText({
+      browser.browserAction.setBadgeText({
         text: to_watch_list.length.toString()
       });
-      chrome.browserAction.setBadgeBackgroundColor({
+      browser.browserAction.setBadgeBackgroundColor({
         color: '#4688F1'
       });
 
@@ -316,14 +310,14 @@ function retrieve_to_watch_list() {
         }
       }
 
-    }
-  });
+
+  },callback);
 }
 
 // Retrieve the watching_anime list from the user list on the nautiljon website
 function set_watching_anime_list_nautiljon() {
   // If the user set is nautiljon's username we can retrieve the list
-  chrome.storage.sync.get(["name_nautiljon"], function(result) {
+  browser.storage.sync.get(["name_nautiljon"]).then(function(result) {
     if (result.name_nautiljon) {
       // Request the page of the user list on nautiljon
       $.get("https://www.nautiljon.com/membre/vu," + result.name_nautiljon + ",anime.html?format=&statut=1", function(data) {
@@ -431,7 +425,7 @@ function set_watching_anime_list_nautiljon() {
         });
       });
     }
-  })
+  },callback)
 }
 
 // Construct the ADN list from the RSS
@@ -564,9 +558,9 @@ function set_to_watch_list_adn(serie) {
             store_to_watch_list();
             store_watching_anime_list();
             links.push(elem.link);
-            chrome.storage.sync.set({
+            browser.storage.sync.set({
               "links": links
-            });
+            }).then(()=>{},callback);
           }
         }
       }
@@ -593,7 +587,7 @@ function set_to_watch_list_crunchyroll(serie) {
           store_to_watch_list();
           store_watching_anime_list();
           links.push(elem.link);
-          chrome.storage.sync.set({
+          browser.storage.sync.set({
             "links": links
           });
         }
@@ -627,9 +621,9 @@ function set_to_watch_list_wakanim(serie) {
             store_to_watch_list();
             store_watching_anime_list();
             links.push(elem.link);
-            chrome.storage.sync.set({
+            browser.storage.sync.set({
               "links": links
-            });
+            }).then(()=>{},callback);
           }
         }
       }
@@ -673,39 +667,35 @@ function startup() {
   setTimeout(set_to_watch_list, 60000);
   setTimeout(startup, 70000);
 }
-chrome.runtime.onInstalled.addListener(function() {
-  console.log("OnInstalled"); // chrome.storage.sync.clear();
+browser.runtime.onInstalled.addListener(function() {
+  console.log("OnInstalled"); // browser.storage.sync.clear();
   retrieve_watching_anime_list();
   retrieve_to_watch_list();
-  chrome.storage.sync.get([
+  browser.storage.sync.get([
     "name_nautiljon", "links"
-  ], function(result) {
-    if (chrome.runtime.lastError)
-      console.log(chrome.runtime.lastError);
-    else {
+  ]).then( function(result) {
+
       if (result.name_nautiljon)
         name_nautiljon = result.name_nautiljon;
-    }
+
     if (result.links) {
       links = result.links;
     }
     startup();
     running = true;
-  });
-  chrome.alarms.create("check_running", {
+  },callback);
+  browser.alarms.create("check_running", {
     'periodInMinutes': 1
   });
 }); //also get the last dates pls
-chrome.runtime.onStartup.addListener(function() {
+browser.runtime.onStartup.addListener(function() {
   console.log("OnStartup");
   retrieve_watching_anime_list();
   retrieve_to_watch_list();
-  chrome.storage.sync.get([
+  browser.storage.sync.get([
     "name_nautiljon", "links"
-  ], function(result) {
-    if (chrome.runtime.lastError)
-      console.log(chrome.runtime.lastError);
-    else {
+  ]).then(function(result) {
+
       if (result.name_nautiljon) {
         name_nautiljon = result.name_nautiljon;
       }
@@ -715,43 +705,41 @@ chrome.runtime.onStartup.addListener(function() {
       }
       running = true;
       startup();
-    }
-  });
+
+  },callback);
 });
 //ADD GET TO EVERY LIST TO SET THEM IN LOCAL AND SET THE LIST IN SYNC WHEN CREATED
-chrome.alarms.onAlarm.addListener(function(alarm) {
+browser.alarms.onAlarm.addListener(function(alarm) {
   if (alarm.name == "check_running") {
     if (!running) {
       retrieve_watching_anime_list();
       retrieve_to_watch_list();
-      chrome.storage.sync.get(["name_nautiljon"], function(result) {
-        if (chrome.runtime.lastError)
-          console.log(chrome.runtime.lastError);
-        else {
+      browser.storage.sync.get(["name_nautiljon"]).then(function(result) {
+
           if (result.name_nautiljon)
             name_nautiljon = result.name_nautiljon;
           running = true;
           refresh();
-        }
-      });
+
+      },callback);
     }
   }
 });
 
-chrome.notifications.onClicked.addListener(function(notificationId) {
+browser.notifications.onClicked.addListener(function(notificationId) {
   notification_links_and_id.forEach(function(elem) {
     if (elem.id == notificationId) {
-      chrome.tabs.create({
+      browser.tabs.create({
         'url': elem.url
       });
     }
   });
 });
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.request == "refreshWatching") {
     set_watching_anime_list_nautiljon();
   } else if (request.request == "settingNautiljon" && request.pseudo) {
-    chrome.storage.sync.remove([
+    browser.storage.sync.remove([
       "name_nautiljon",
       "nb_watching_anime_list",
       "watching_anime_list1",
@@ -759,14 +747,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       "watching_anime_list3",
       "watching_anime_list4",
       "watching_anime_list5"
-    ], function() {
-      chrome.storage.sync.set({
+    ]).then( function() {
+      browser.storage.sync.set({
         "name_nautiljon": request.pseudo
-      }, function() {
+      }).then(function() {
         set_watching_anime_list_nautiljon();
         sendResponse();
-      });
-    });
+      },callback);
+    },callback);
   } else if (request.request == "episodeSeen" && request.url) {
     var index = to_watch_list.findIndex(function(element) {
       if (element.link == request.url) {
@@ -787,14 +775,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     if (index != -1) {
       links.splice(index, 1);
-      chrome.storage.sync.set({
+      browser.storage.sync.set({
         "links": links
-      });
+      }).then(()=>{},callback);
     }
   }
 });
 
-chrome.storage.onChanged.addListener(function(changes, areaName) {
+browser.storage.onChanged.addListener(function(changes, areaName) {
   if (changes.nb_to_watch_list || changes.to_watch_list1 || changes.to_watch_list2 || changes.to_watch_list3 || changes.to_watch_list4 || changes.to_watch_list5) {
     retrieve_to_watch_list();
     retrieve_watching_anime_list();

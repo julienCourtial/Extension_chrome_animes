@@ -1,9 +1,13 @@
+function callback(error) {
+  console.error(error);
+}
+
 function removeFromList() {
-  chrome.runtime.sendMessage({
+  browser.runtime.sendMessage({
     request: "episodeSeen",
     url: location.href
-  }, function(response) {});
-  $("#imgAnimeFR")[0].src = chrome.runtime.getURL("images/check.png");
+  }.then( function(response) {},callback);
+  $("#imgAnimeFR")[0].src = browser.runtime.getURL("images/check.png");
 }
 
 function trackPlayer() {
@@ -18,7 +22,7 @@ function trackPlayer() {
   }
 }
 
-chrome.storage.sync.get(["links"], function(result) {
+browser.storage.sync.get(["links"]).then( function(result) {
   if (result.links) {
     if (result.links.includes(location.href)) {
       var div = $(".episodeBtns")[0];
@@ -28,7 +32,7 @@ chrome.storage.sync.get(["links"], function(result) {
       link.classList.add("episodeBtns-item");
       var img = document.createElement("img");
       img.id = "imgAnimeFR";
-      img.src = chrome.runtime.getURL("images/logo_null32.png");
+      img.src = browser.runtime.getURL("images/logo_null32.png");
       link.href = "";
       link.append(img);
       var text = document.createElement("span");
@@ -45,4 +49,4 @@ chrome.storage.sync.get(["links"], function(result) {
 
     }
   }
-});
+},callback);
