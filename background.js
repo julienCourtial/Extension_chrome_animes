@@ -467,8 +467,8 @@ function set_crunchyroll_list() {
         }
       });
       let link = $(this).find("link").text().replace("http", "https");
-      if(link.includes('/fr/')){
-        link.replace("www.crunchyroll.com/","www.crunchyroll.com/fr/");
+      if (link.includes('/fr/')) {
+        link.replace("www.crunchyroll.com/", "www.crunchyroll.com/fr/");
       }
       var item = {
         title: $(this).find("title").text(),
@@ -544,7 +544,7 @@ function set_to_watch_list_adn(serie) {
       titles = titles.concat(" /", serie.title_alt.toLowerCase());
 
     for (var i = adn_list.length - 1; i >= 0; i--) {
-      var elem = adn_list[i];
+      let elem = adn_list[i];
       if (elem.title.includes("Épisode")) {
 
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
@@ -577,7 +577,7 @@ function set_to_watch_list_crunchyroll(serie) {
     if (serie.title_alt)
       titles = titles.concat(" /", serie.title_alt.toLowerCase());
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
-      var elem = crunchyroll_list[i];
+      let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
       if (titles.includes(elem.seriesTitle.toLowerCase())) {
         if (serie.last_ep_notify < num_ep) {
@@ -606,7 +606,7 @@ function set_to_watch_list_wakanim(serie) {
       titles = titles.concat(" /", serie.title_alt.toLowerCase());
 
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
-      elem = wakanim_list[i];
+      let elem = wakanim_list[i];
       if (elem.title.includes("Épisode")) {
 
         var true_title = elem.title;
@@ -788,7 +788,5 @@ browser.storage.onChanged.addListener(function(changes, areaName) {
     retrieve_watching_anime_list();
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     retrieve_watching_anime_list();
-  } else if (changes.links) {
-    links = changes.links.newValue;
   }
 });
