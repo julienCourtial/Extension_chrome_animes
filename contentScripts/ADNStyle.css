@@ -1,5 +1,5 @@
 .icon-flag:before{
-  content: url('chrome-extension://__MSG_@@extension_id__/images/logo_null16.png');
+  content: url('../images/logo_null16.png');
 }
 
 .icon-anime-fr-check:before{

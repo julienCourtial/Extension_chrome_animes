@@ -1,5 +1,3 @@
-console.log("CS Crunchy");
-
 function callback(error) {
   console.error(error);
 }
@@ -8,7 +6,7 @@ function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
     url: location.href
-  }.then( function(response) {},callback);
+  }).then( function(response) {},callback);
 
   if ($("#check_anime")[0] == undefined) {
     var check = document.createElement("img");

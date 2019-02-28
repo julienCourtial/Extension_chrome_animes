@@ -1,4 +1,3 @@
-console.log("CS Waka");
 function callback(error) {
   console.error(error);
 }
@@ -7,7 +6,7 @@ function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
     url: location.href
-  }.then( function(response) {},callback);
+  }).then( function(response) {},callback);
   $("#imgAnimeFR")[0].src = browser.runtime.getURL("images/check.png");
 }
 

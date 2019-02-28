@@ -1,4 +1,3 @@
-console.log("CS ADN");
 var site;
 function callback(error) {
   console.error(error);
@@ -8,7 +7,7 @@ function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
     url: site
-  }.then( function(response) {},callback);
+  }).then( function(response) {},callback);
 
   console.log($("#logo-flag")[0].classList);
   $("#logo-flag")[0].classList.replace("icon-flag", "icon-anime-fr-check");
