@@ -8,7 +8,10 @@ function removeFromList() {
     url: location.href
   }).then( function(response) {},callback);
 
+  console.log("outside if");
+  console.log($("#check_anime"));
   if ($("#check_anime")[0] == undefined) {
+    console.log("in if");
     var check = document.createElement("img");
     check.src = browser.runtime.getURL("images/check.png");
     check.id = "check_anime";
