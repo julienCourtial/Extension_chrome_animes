@@ -788,5 +788,7 @@ browser.storage.onChanged.addListener(function(changes, areaName) {
     retrieve_watching_anime_list();
   } else if (changes.nb_watching_anime_list || changes.watching_anime_list1 || changes.watching_anime_list2 || changes.watching_anime_list3 || changes.watching_anime_list4 || changes.watching_anime_list5) {
     retrieve_watching_anime_list();
+  } else if (changes.links) {
+    links = changes.links.newValue;
   }
 });
