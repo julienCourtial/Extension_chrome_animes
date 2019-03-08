@@ -714,12 +714,17 @@ browser.alarms.onAlarm.addListener(function(alarm) {
     if (!running) {
       retrieve_watching_anime_list();
       retrieve_to_watch_list();
-      browser.storage.sync.get(["name_nautiljon"]).then(function(result) {
+      browser.storage.sync.get(["name_nautiljon", "links"]).then(function(result) {
 
-        if (result.name_nautiljon)
+        if (result.name_nautiljon) {
           name_nautiljon = result.name_nautiljon;
+        }
+
+        if (result.links) {
+          links = result.links;
+        }
         running = true;
-        refresh();
+        startup();
 
       }, callback);
     }
