@@ -689,14 +689,17 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     if (!running) {
       retrieve_watching_anime_list();
       retrieve_to_watch_list();
-      chrome.storage.sync.get(["name_nautiljon"], function(result) {
+      chrome.storage.sync.get(["name_nautiljon", "links"], function(result) {
         if (chrome.runtime.lastError)
           console.log(chrome.runtime.lastError);
         else {
           if (result.name_nautiljon)
             name_nautiljon = result.name_nautiljon;
+          if (result.links) {
+            links = result.links;
+          }
           running = true;
-          refresh();
+          startup();
         }
       });
     }
