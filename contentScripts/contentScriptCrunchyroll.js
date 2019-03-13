@@ -18,7 +18,7 @@ function removeFromList() {
     let check = document.createElement("img");
     check.src = browser.runtime.getURL("images/check.png");
     check.id = "check_anime";
-    document.querySelector("#check_anime").append(check);
+    document.querySelector("#episodeSeen").append(check);
   }
 }
 
