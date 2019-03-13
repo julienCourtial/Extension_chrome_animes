@@ -1,6 +1,6 @@
 {
   "name": "Anime Notifier FR",
-  "version": "1.3.3",
+  "version": "1.3.5",
   "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
   "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
   "background": {

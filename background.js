@@ -441,7 +441,7 @@ function set_crunchyroll_list() {
         }
       });
       let link = $(this).find("link").text().replace("http", "https");
-      if (link.includes('/fr/')) {
+      if (!link.includes('/fr/')) {
         link.replace("www.crunchyroll.com/", "www.crunchyroll.com/fr/");
       }
       var item = {
