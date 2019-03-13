@@ -579,7 +579,7 @@ function set_to_watch_list_crunchyroll(serie) {
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      if (titles.includes(elem.seriesTitle.toLowerCase())) {
+      if (titles.includes(elem.seriesTitle.toLowerCase()) && !elem.title.toLowerCase().includes("dub")) {
         if (serie.last_ep_notify < num_ep) {
           serie.last_ep_notify = num_ep;
           to_watch_list.push(elem);
