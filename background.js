@@ -467,7 +467,7 @@ function set_crunchyroll_list() {
         }
       });
       let link = $(this).find("link").text().replace("http", "https");
-      if (link.includes('/fr/')) {
+      if (!link.includes('/fr/')) {
         link.replace("www.crunchyroll.com/", "www.crunchyroll.com/fr/");
       }
       var item = {
@@ -579,7 +579,7 @@ function set_to_watch_list_crunchyroll(serie) {
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      if (titles.includes(elem.seriesTitle.toLowerCase())) {
+      if (titles.includes(elem.seriesTitle.toLowerCase()) && !elem.title.toLowerCase().includes("dub")) {
         if (serie.last_ep_notify < num_ep) {
           serie.last_ep_notify = num_ep;
           to_watch_list.push(elem);
@@ -714,12 +714,17 @@ browser.alarms.onAlarm.addListener(function(alarm) {
     if (!running) {
       retrieve_watching_anime_list();
       retrieve_to_watch_list();
-      browser.storage.sync.get(["name_nautiljon"]).then(function(result) {
+      browser.storage.sync.get(["name_nautiljon", "links"]).then(function(result) {
 
-        if (result.name_nautiljon)
+        if (result.name_nautiljon) {
           name_nautiljon = result.name_nautiljon;
+        }
+
+        if (result.links) {
+          links = result.links;
+        }
         running = true;
-        refresh();
+        startup();
 
       }, callback);
     }

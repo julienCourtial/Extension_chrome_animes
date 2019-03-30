@@ -6,20 +6,23 @@ function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
     url: location.href
-  }).then( function(response) {},callback);
+  }).then(function(response) {}, callback);
 
   console.log("outside if");
-  console.log($("#check_anime"));
-  if ($("#check_anime")[0] == undefined) {
+  let check = document.createElement("img");
+  check.src = browser.runtime.getURL("images/check.png");
+  check.id = "check_anime";
+  console.log(document.querySelector("#check_anime"));
+  if (document.querySelector("#check_anime") == undefined) {
     console.log("in if");
-    var check = document.createElement("img");
+    let check = document.createElement("img");
     check.src = browser.runtime.getURL("images/check.png");
     check.id = "check_anime";
-    $("#episodeSeen")[0].append(check);
+    document.querySelector("#episodeSeen").append(check);
   }
 }
 
-browser.storage.sync.get(["links"]).then( function(result) {
+browser.storage.sync.get(["links"]).then(function(result) {
   if (result.links) {
     if (result.links.includes(location.href)) {
       var div = $(".showmedia-submenu")[0];
@@ -41,4 +44,4 @@ browser.storage.sync.get(["links"]).then( function(result) {
     }
 
   }
-},callback);
+}, callback);
