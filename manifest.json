@@ -2,7 +2,7 @@
   "name": "Anime Notifier FR",
   "version": "1.4.0",
   "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
-  "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/"],
+  "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/","https://api.twitter.com/"],
   "background": {
     "scripts": ["useful/jquery-3.3.1.min.js","useful/sizeof.js", "background.js"],
     "persistent": true
