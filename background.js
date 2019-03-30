@@ -485,55 +485,73 @@ function set_crunchyroll_list() {
 // Since there is no RSS for Wakanim, construct the list from the front page of Wakanim.
 function set_wakanim_list() {
   wakanim_list = [];
-  $.get("https://www.wakanim.tv/fr/v2", function(data) {
-    var items = new Array();
-    $(data).each(function(elem) {
-      if ($(this)[0].nodeName.toLowerCase() == "section" && $(this)[0].classList[0] == "slider-section") {
-        $(this)[0].childNodes.forEach(function(elem) {
-          if (elem.nodeName.toLowerCase() == "div" && elem.classList[0] == "container") {
-            var right_section = false;
-            elem.childNodes.forEach(function(elem2) {
-              if (elem2.nodeName.toLowerCase() == "header" && elem2.classList.value == "slider-section_header") {
-                if (elem2.children[0].nodeName.toLowerCase() == "h2" && elem2.children[0].classList.value == "slider-section_title") {
-                  if (elem2.children[0].textContent == "Derniers épisodes diffusés") {
-                    right_section = true;
-                  }
-                }
-              }
-              if (right_section && elem2.nodeName.toLowerCase() == "div" && elem2.classList.value == "slider js-slider js-slider-lastEp") {
-                var list_last_ep = elem2.children[0].children[0].children[0].children;
-                for (var i = 0; i < list_last_ep.length; i++) {
-                  var num_ep;
-                  var saison;
-                  var series;
-                  var image;
-                  var link;
-                  for (var j = 0; j < list_last_ep[i].children.length; j++) {
-                    if (list_last_ep[i].children[j].classList[0] == "slider_item_image") {
-                      num_ep = list_last_ep[i].children[j].children[1].textContent.trim();
-                      link = list_last_ep[i].children[j].children[1].getAttribute("href");
-                      image = list_last_ep[i].children[j].children[0].children[0].getAttribute("src");
-                    } else if (list_last_ep[i].children[j].classList[0] == "slider_item_description") {
-                      saison = list_last_ep[i].children[j].children[0].children[2].textContent;
-                      series = list_last_ep[i].children[j].children[0].children[0].textContent;
-                    }
-                  };
-                  var item = {
-                    title: series + " " + saison + " Épisode " + num_ep,
-                    link: "https://www.wakanim.tv" + link,
-                    img: "https:" + image,
-                    from: "Wakanim"
-                  };
-                  wakanim_list.push(item);
-                }
-                right_section = false;
-              }
-            });
+
+  const req = new XMLHttpRequest();
+
+  req.onreadystatechange = function(event) {
+      // XMLHttpRequest.DONE === 4
+      if (this.readyState === XMLHttpRequest.DONE) {
+          if (this.status === 200) {
+              console.log("Réponse reçue: %s", this.responseText);
+          } else {
+              console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
           }
-        });
       }
-    });
-  });
+  };
+
+  req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=3', true);
+  req.setRequestHeader("Authorization", "Bearer insert here");
+  req.send(null);
+
+  // $.get("https://www.wakanim.tv/fr/v2", function(data) {
+  //   var items = new Array();
+  //   $(data).each(function(elem) {
+  //     if ($(this)[0].nodeName.toLowerCase() == "section" && $(this)[0].classList[0] == "slider-section") {
+  //       $(this)[0].childNodes.forEach(function(elem) {
+  //         if (elem.nodeName.toLowerCase() == "div" && elem.classList[0] == "container") {
+  //           var right_section = false;
+  //           elem.childNodes.forEach(function(elem2) {
+  //             if (elem2.nodeName.toLowerCase() == "header" && elem2.classList.value == "slider-section_header") {
+  //               if (elem2.children[0].nodeName.toLowerCase() == "h2" && elem2.children[0].classList.value == "slider-section_title") {
+  //                 if (elem2.children[0].textContent == "Derniers épisodes diffusés") {
+  //                   right_section = true;
+  //                 }
+  //               }
+  //             }
+  //             if (right_section && elem2.nodeName.toLowerCase() == "div" && elem2.classList.value == "slider js-slider js-slider-lastEp") {
+  //               var list_last_ep = elem2.children[0].children[0].children[0].children;
+  //               for (var i = 0; i < list_last_ep.length; i++) {
+  //                 var num_ep;
+  //                 var saison;
+  //                 var series;
+  //                 var image;
+  //                 var link;
+  //                 for (var j = 0; j < list_last_ep[i].children.length; j++) {
+  //                   if (list_last_ep[i].children[j].classList[0] == "slider_item_image") {
+  //                     num_ep = list_last_ep[i].children[j].children[1].textContent.trim();
+  //                     link = list_last_ep[i].children[j].children[1].getAttribute("href");
+  //                     image = list_last_ep[i].children[j].children[0].children[0].getAttribute("src");
+  //                   } else if (list_last_ep[i].children[j].classList[0] == "slider_item_description") {
+  //                     saison = list_last_ep[i].children[j].children[0].children[2].textContent;
+  //                     series = list_last_ep[i].children[j].children[0].children[0].textContent;
+  //                   }
+  //                 };
+  //                 var item = {
+  //                   title: series + " " + saison + " Épisode " + num_ep,
+  //                   link: "https://www.wakanim.tv" + link,
+  //                   img: "https:" + image,
+  //                   from: "Wakanim"
+  //                 };
+  //                 wakanim_list.push(item);
+  //               }
+  //               right_section = false;
+  //             }
+  //           });
+  //         }
+  //       });
+  //     }
+  //   });
+  // });
 }
 
 // Look in the ADN list if the serie given has a new episode released
