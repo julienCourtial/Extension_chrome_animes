@@ -534,7 +534,7 @@ function set_wakanim_list() {
           }
       }
   }
-  fileReq.open('GET', chrome.runtime.getURL("bearer"), true);
+  fileReq.open('GET', chrome.runtime.getURL("bearer.txt"), true);
   fileReq.send(null);
   
 
