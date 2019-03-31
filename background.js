@@ -466,14 +466,62 @@ function set_wakanim_list() {
       // XMLHttpRequest.DONE === 4
       if (this.readyState === XMLHttpRequest.DONE) {
           if (this.status === 200) {
-              console.log("Réponse reçue: %s", this.responseText);
+              let tweets = JSON.parse(this.responseText);
+              for(let tweet of tweets){
+                if(tweet.text.includes("►Épisode")){
+                  let titles = tweet.text.split('\n');
+
+                  //Removing emojis from tweet
+                  let regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|[\ud83c[\ude50\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|\uFE0F|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
+
+                  titles[0] = titles[0].replace(regex, '');
+                  titles[0] = titles[0].trim();
+
+                  let title = "";
+
+                  if(titles[2].includes('►Épisode')){
+                    title = titles[0] + " "+ (titles[2].split(':')[0]).slice(1);
+                  }else{
+                    title = titles[0] + " "+ (titles[4].split(':')[0]).slice(1);
+                  }
+
+                  
+                  let link = tweet.entities.urls[0].expanded_url;
+                  let img = '';
+
+                  if(tweet.entities.media){
+                    img = tweet.entities.media[0].media_url_https;
+                  }
+                  
+                  const req2 = new XMLHttpRequest();
+                  req2.onreadystatechange = function(event) {
+                    if (this.readyState === XMLHttpRequest.DONE) {
+                      if (this.status === 200) {
+                        let item = {
+                          title: title,
+                          link: this.responseURL,
+                          img: img,
+                          from: "Wakanim"
+                        };
+                        wakanim_list.push(item);
+                      } else {
+                          console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
+                      }
+                    }
+
+                  }
+                  req2.open('HEAD',link,true);
+                  req2.send(null);
+                  
+                }
+              }
           } else {
               console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
           }
       }
   };
 
-  req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=3', true);
+  req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
   req.setRequestHeader("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAHPx9gAAAAAAqZ9%2FRejdtavgeBRKaBpPz8rp8Go%3DzxsVWiN4xKKn1LK3KpXEH7GgDBy7r1iIWIWlySqa9LkRwNuoIh");
   req.send(null);
   // $.get("https://www.wakanim.tv/fr/v2", function(data) {
@@ -568,7 +616,7 @@ function set_to_watch_list_crunchyroll(item) {
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      if (titles.includes(elem.seriesTitle.toLowerCase())) {
+      if (titles.includes(elem.seriesTitle.toLowerCase()) && !elem.title.toLowerCase().includes("dub")) {
         if (item.last_ep_notify < num_ep) {
           item.last_ep_notify = num_ep;
           to_watch_list.push(elem);
@@ -596,12 +644,20 @@ function set_to_watch_list_wakanim(item) {
     for (var i = wakanim_list.length - 1; i >= 0; i--) {
       let elem = wakanim_list[i];
       if (elem.title.includes("Épisode")) {
-
         var true_title = elem.title;
         let num_ep = parseInt(elem.title.split("Épisode ")[1]);
         if (true_title.includes("-"))
           true_title = true_title.split(" -")[0];
-        if (titles.includes(true_title.split(" Saison")[0].toLowerCase()) || titles.includes(true_title.split(" Arc")[0].toLowerCase())) {
+
+        true_title = true_title.split(" Épisode ")[0].toLowerCase();
+        console.log(titles);
+        console.log(true_title);
+        for(let i = 0 ; i< true_title.length;i++){
+          console.log(true_title.codePointAt(i));
+        }
+
+        console.log(titles.includes(true_title));
+        if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
           if (item.last_ep_notify < num_ep) {
             item.last_ep_notify = num_ep;
             to_watch_list.push(elem);
