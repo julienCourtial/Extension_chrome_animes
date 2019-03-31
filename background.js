@@ -466,7 +466,7 @@ function set_wakanim_list() {
           if (this.status === 200) {
             let bearer = this.responseText;
 
-            
+
             const req = new XMLHttpRequest();
 
             req.onreadystatechange = function(event) {
@@ -665,11 +665,6 @@ function set_to_watch_list_wakanim(item) {
           true_title = true_title.split(" -")[0];
 
         true_title = true_title.split(" Épisode ")[0].toLowerCase();
-        console.log(titles);
-        console.log(true_title);
-        for(let i = 0 ; i< true_title.length;i++){
-          console.log(true_title.codePointAt(i));
-        }
 
         console.log(titles.includes(true_title));
         if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
