@@ -665,8 +665,6 @@ function set_to_watch_list_wakanim(item) {
           true_title = true_title.split(" -")[0];
 
         true_title = true_title.split(" Épisode ")[0].toLowerCase();
-
-        console.log(titles.includes(true_title));
         if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
           if (item.last_ep_notify < num_ep) {
             item.last_ep_notify = num_ep;
