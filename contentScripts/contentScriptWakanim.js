@@ -1,3 +1,5 @@
+var site;
+
 function callback(error) {
   console.error(error);
 }
@@ -5,8 +7,8 @@ function callback(error) {
 function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
-    url: location.href
-  }).then( function(response) {},callback);
+    url: site
+  }).then(function(response) {}, callback);
   $("#imgAnimeFR")[0].src = browser.runtime.getURL("images/check.png");
 }
 
@@ -22,9 +24,18 @@ function trackPlayer() {
   }
 }
 
-browser.storage.sync.get(["links"]).then( function(result) {
+browser.storage.sync.get(["links"]).then(function(result) {
   if (result.links) {
-    if (result.links.includes(location.href)) {
+    let isLink = false;
+    site = location.href;
+    for (let link of result.links) {
+      if (site.includes(link)) {
+        site = link;
+        isLink = true;
+        break;
+      }
+    }
+    if (isLink) {
       var div = $(".episodeBtns")[0];
 
       var link = document.createElement("a");
@@ -49,4 +60,4 @@ browser.storage.sync.get(["links"]).then( function(result) {
 
     }
   }
-},callback);
+}, callback);
