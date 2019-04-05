@@ -231,9 +231,7 @@ function display_to_watch_list() {
           };
 
         }, callback);
-
-    }
-
+  }
     function display_form_nautiljon() {
       var card = document.querySelector("#form_nautiljon");
       var div = $("#watching_list");
@@ -254,6 +252,18 @@ function display_to_watch_list() {
           $("#watching_list")[0].textContent = "";
           display_watching_list();
         };
+        document.onkeyup = function(event){
+          if(event.keyCode == 13 && event.target == $("#pseudo")[0]){
+            chrome.runtime.sendMessage({
+            request: "settingNautiljon",
+            pseudo: $("#pseudo")[0].value
+          }, function(response) {
+            console.log(response);
+            // $("#watching_list")[0].textContent = "";
+            // display_watching_list();
+          });
+          }
+        }
       }
 
       browser.storage.sync.get(["name_nautiljon"]).then(function(result) {
