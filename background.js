@@ -334,93 +334,88 @@ function set_watching_anime_list_nautiljon() {
 
           var licence = null;
 
-          var already_in = false;
+          let last_ep_notify = 0;
 
-          for (var i = 0; !already_in && i < old_watching.length; i++) {
+          for (var i = 0; i < old_watching.length; i++) {
             if (old_watching[i].title == animes[0].childNodes[0].text) {
-              already_in = true;
-              watching_anime_list.push(old_watching[i]);
-              watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
-              });
-              if (watching_anime_list.length == size) {
-                store_watching_anime_list();
-              }
+              last_ep_notify = old_watching[i].last_ep_notify;
+              break;
             }
           }
-          if (!already_in) {
-            $.get("https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"), function(data2) {
-              var info;
-              var ul_array = $(data2).find("ul");
-              for (var i = 0; i < ul_array.length; i++) {
-                if (ul_array[i].classList[0] == "mb10") {
-                  info = ul_array[i].childNodes;
+          $.get("https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"), function(data2) {
+            var info;
+            var ul_array = $(data2).find("ul");
+            for (var i = 0; i < ul_array.length; i++) {
+              if (ul_array[i].classList[0] == "mb10") {
+                info = ul_array[i].childNodes;
+              }
+            }
+            if (!info) {
+              console.log("Pas une bonne page nautiljon");
+              return;
+            }
+            var licencie = false;
+            var title_alt = null;
+            for (var j = 0; j < info.length; j++) {
+              var elem_li = info[j];
+
+              var section = elem_li.textContent.split(" : ");
+              var section_title = section.shift();
+              var section_content = section.join(' : ');
+
+              if (section_title === "Titre alternatif") {
+                title_alt = section_content;
+              } else if (section_title === "Licencié en France") {
+                licencie = true;
+              } else if (licencie && section_title === "Editeur") {
+                licence = section_content.split(' ')[1]
+
+                licencie = false;
+              } else if (licencie && section_title === "Editeurs") {
+
+                var table = [];
+
+                editeurs = section_content.split(" -");
+
+                for (var m = 0; m < editeurs.length; m++) {
+                  table.push(editeurs[m].split(" ")[1]);
                 }
+                licence = table.join(" - ");
+
+                licencie = false;
               }
-              if (!info) {
-                console.log("Pas une bonne page nautiljon");
-                return;
-              }
-              var licencie = false;
-              var title_alt = null;
-              for (var j = 0; j < info.length; j++) {
-                var elem_li = info[j];
+            }
 
-                var section = elem_li.textContent.split(" : ");
-                var section_title = section.shift();
-                var section_content = section.join(' : ');
+            let image = $(data2).find("#onglets_3_image");
+            if (image.length > 0) {
+              image = image[0].childNodes[0].getAttribute("src");
+            }
 
-                if (section_title === "Titre alternatif") {
-                  title_alt = section_content;
-                } else if (section_title === "Licencié en France") {
-                  licencie = true;
-                } else if (licencie && section_title === "Editeur") {
-                  licence = section_content.split(' ')[1]
+            let synopsis = $(data2).find(".description")[0].textContent;
+            if (synopsis.length > 300)
+              synopsis = synopsis.substring(0, 300) + "...";
 
-                  licencie = false;
-                } else if (licencie && section_title === "Editeurs") {
 
-                  var table = [];
-
-                  editeurs = section_content.split(" -");
-
-                  for (var m = 0; m < editeurs.length; m++) {
-                    table.push(editeurs[m].split(" ")[1]);
-                  }
-                  licence = table.join(" - ");
-
-                  licencie = false;
-                }
-              }
-
-              let image = $(data2).find("#onglets_3_image");
-              if (image.length > 0) {
-                image = image[0].childNodes[0].getAttribute("src");
-              }
-
-              let synopsis = $(data2).find(".description")[0].textContent;
-              if (synopsis.length > 300)
-                synopsis = synopsis.substring(0, 300) + "...";
-              var item = {
-                title: animes[0].childNodes[0].text,
-                editeur: licence,
-                title_alt: title_alt,
-                image: "https://www.nautiljon.com" + image,
-                link: "https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"),
-                description: synopsis,
-                last_ep_notify: 0
-              }
-              watching_anime_list.push(item);
-              watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
-              });
-              if (watching_anime_list.length == size) {
-                store_watching_anime_list();
-              }
-
+            var item = {
+              title: animes[0].childNodes[0].text,
+              editeur: licence,
+              title_alt: title_alt,
+              image: "https://www.nautiljon.com" + image,
+              link: "https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"),
+              description: synopsis,
+              last_ep_notify: last_ep_notify
+            }
+            watching_anime_list.push(item);
+            watching_anime_list.sort(function(a, b) {
+              return a.title.localeCompare(b.title);
             });
+            if (watching_anime_list.length == size) {
+              store_watching_anime_list();
+            }
 
-          }
+          });
+
+
 
         });
       });
@@ -488,78 +483,78 @@ function set_wakanim_list() {
 
   const fileReq = new XMLHttpRequest();
   fileReq.onreadystatechange = function(event) {
-      // XMLHttpRequest.DONE === 4
-      if (this.readyState === XMLHttpRequest.DONE) {
-          if (this.status === 200) {
-            let bearer = this.responseText;
+    // XMLHttpRequest.DONE === 4
+    if (this.readyState === XMLHttpRequest.DONE) {
+      if (this.status === 200) {
+        let bearer = this.responseText;
 
 
-            const req = new XMLHttpRequest();
+        const req = new XMLHttpRequest();
 
-            req.onreadystatechange = function(event) {
-                // XMLHttpRequest.DONE === 4
-                if (this.readyState === XMLHttpRequest.DONE) {
-                    if (this.status === 200) {
-                        let tweets = JSON.parse(this.responseText);
-                        for(let tweet of tweets){
-                          if(tweet.text.includes("►Épisode")){
-                            let titles = tweet.text.split('\n');
+        req.onreadystatechange = function(event) {
+          // XMLHttpRequest.DONE === 4
+          if (this.readyState === XMLHttpRequest.DONE) {
+            if (this.status === 200) {
+              let tweets = JSON.parse(this.responseText);
+              for (let tweet of tweets) {
+                if (tweet.text.includes("►Épisode")) {
+                  let titles = tweet.text.split('\n');
 
-                            //Removing emojis from tweet
-                            let regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|[\ud83c[\ude50\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|\uFE0F|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
+                  //Removing emojis from tweet
+                  let regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|[\ud83c[\ude50\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|\uFE0F|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
 
-                            titles[0] = titles[0].replace(regex, '');
-                            titles[0] = titles[0].trim();
+                  titles[0] = titles[0].replace(regex, '');
+                  titles[0] = titles[0].trim();
 
-                            let title = "";
+                  let title = "";
 
-                            if(titles[2].includes('►Épisode')){
-                              title = titles[0] + " "+ (titles[2].split(':')[0]).slice(1);
-                            }else{
-                              title = titles[0] + " "+ (titles[4].split(':')[0]).slice(1);
-                            }
+                  if (titles[2].includes('►Épisode')) {
+                    title = titles[0] + " " + (titles[2].split(':')[0]).slice(1);
+                  } else {
+                    title = titles[0] + " " + (titles[4].split(':')[0]).slice(1);
+                  }
 
-                            
-                            let link = tweet.entities.urls[0].expanded_url;
-                            let img = '';
 
-                            if(tweet.entities.media){
-                              img = tweet.entities.media[0].media_url_https;
-                            }
-                            
-                            const req2 = new XMLHttpRequest();
-                            req2.onreadystatechange = function(event) {
-                              if (this.readyState === XMLHttpRequest.DONE) {
-                                if (this.status === 200) {
-                                  let item = {
-                                    title: title,
-                                    link: this.responseURL,
-                                    img: img,
-                                    from: "Wakanim"
-                                  };
-                                  wakanim_list.push(item);
-                                } else {
-                                    console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
-                                }
-                              }
+                  let link = tweet.entities.urls[0].expanded_url;
+                  let img = '';
 
-                            }
-                            req2.open('HEAD',link,true);
-                            req2.send(null);
-                            
-                          }
-                        }
-                    } else {
+                  if (tweet.entities.media) {
+                    img = tweet.entities.media[0].media_url_https;
+                  }
+
+                  const req2 = new XMLHttpRequest();
+                  req2.onreadystatechange = function(event) {
+                    if (this.readyState === XMLHttpRequest.DONE) {
+                      if (this.status === 200) {
+                        let item = {
+                          title: title,
+                          link: this.responseURL,
+                          img: img,
+                          from: "Wakanim"
+                        };
+                        wakanim_list.push(item);
+                      } else {
                         console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
+                      }
                     }
-                }
-            };
 
-            req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
-            req.setRequestHeader("Authorization", "Bearer "+bearer);
-            req.send(null);
+                  }
+                  req2.open('HEAD', link, true);
+                  req2.send(null);
+
+                }
+              }
+            } else {
+              console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
+            }
           }
+        };
+
+        req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
+        req.setRequestHeader("Authorization", "Bearer " + bearer);
+        req.send(null);
       }
+    }
   }
   fileReq.open('GET', browser.runtime.getURL("bearer.txt"), true);
   fileReq.send(null);
