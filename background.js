@@ -577,6 +577,9 @@ function set_to_watch_list_adn(serie) {
 
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
         true_title = true_title.replace("’", "'");
+        let regex = / /g;
+        true_title = true_title.replace(regex, "");
+        titles = titles.replace(regex, "");
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
         if (titles.includes(true_title)) {
           if (serie.last_ep_notify < num_ep) {
@@ -607,7 +610,10 @@ function set_to_watch_list_crunchyroll(serie) {
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      if (titles.includes(elem.seriesTitle.toLowerCase()) && !elem.title.toLowerCase().includes("dub")) {
+      let regex = / /g;
+      let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
+      titles = titles.replace(regex, "");
+      if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
         if (serie.last_ep_notify < num_ep) {
           serie.last_ep_notify = num_ep;
           to_watch_list.push(elem);
@@ -641,7 +647,9 @@ function set_to_watch_list_wakanim(serie) {
         if (true_title.includes("-"))
           true_title = true_title.split(" -")[0];
 
-        true_title = true_title.split(" Épisode ")[0].toLowerCase();
+        let regex = / /g;
+        true_title = true_title.split(" Épisode ")[0].toLowerCase().replace(regex, "");
+        titles = titles.replace(regex, "");
         if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
           if (serie.last_ep_notify < num_ep) {
             serie.last_ep_notify = num_ep;
