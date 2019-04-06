@@ -461,133 +461,82 @@ function set_wakanim_list() {
 
   const fileReq = new XMLHttpRequest();
   fileReq.onreadystatechange = function(event) {
-      // XMLHttpRequest.DONE === 4
-      if (this.readyState === XMLHttpRequest.DONE) {
-          if (this.status === 200) {
-            let bearer = this.responseText;
+    // XMLHttpRequest.DONE === 4
+    if (this.readyState === XMLHttpRequest.DONE) {
+      if (this.status === 200) {
+        let bearer = this.responseText;
 
 
-            const req = new XMLHttpRequest();
+        const req = new XMLHttpRequest();
 
-            req.onreadystatechange = function(event) {
-                // XMLHttpRequest.DONE === 4
-                if (this.readyState === XMLHttpRequest.DONE) {
-                    if (this.status === 200) {
-                        let tweets = JSON.parse(this.responseText);
-                        for(let tweet of tweets){
-                          if(tweet.text.includes("►Épisode")){
-                            let titles = tweet.text.split('\n');
+        req.onreadystatechange = function(event) {
+          // XMLHttpRequest.DONE === 4
+          if (this.readyState === XMLHttpRequest.DONE) {
+            if (this.status === 200) {
+              let tweets = JSON.parse(this.responseText);
+              for (let tweet of tweets) {
+                if (tweet.text.includes("►Épisode")) {
+                  let titles = tweet.text.split('\n');
 
-                            //Removing emojis from tweet
-                            let regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|[\ud83c[\ude50\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|\uFE0F|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
+                  //Removing emojis from tweet
+                  let regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|[\ud83c[\ude01\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|[\ud83c[\ude32\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|[\ud83c[\ude50\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|\uFE0F|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
 
-                            titles[0] = titles[0].replace(regex, '');
-                            titles[0] = titles[0].trim();
+                  titles[0] = titles[0].replace(regex, '');
+                  titles[0] = titles[0].trim();
 
-                            let title = "";
+                  let title = "";
 
-                            if(titles[2].includes('►Épisode')){
-                              title = titles[0] + " "+ (titles[2].split(':')[0]).slice(1);
-                            }else{
-                              title = titles[0] + " "+ (titles[4].split(':')[0]).slice(1);
-                            }
+                  if (titles[2].includes('►Épisode')) {
+                    title = titles[0] + " " + (titles[2].split(':')[0]).slice(1);
+                  } else {
+                    title = titles[0] + " " + (titles[4].split(':')[0]).slice(1);
+                  }
 
-                            
-                            let link = tweet.entities.urls[0].expanded_url;
-                            let img = '';
 
-                            if(tweet.entities.media){
-                              img = tweet.entities.media[0].media_url_https;
-                            }
-                            
-                            const req2 = new XMLHttpRequest();
-                            req2.onreadystatechange = function(event) {
-                              if (this.readyState === XMLHttpRequest.DONE) {
-                                if (this.status === 200) {
-                                  let item = {
-                                    title: title,
-                                    link: this.responseURL,
-                                    img: img,
-                                    from: "Wakanim"
-                                  };
-                                  wakanim_list.push(item);
-                                } else {
-                                    console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
-                                }
-                              }
+                  let link = tweet.entities.urls[0].expanded_url;
+                  let img = '';
 
-                            }
-                            req2.open('HEAD',link,true);
-                            req2.send(null);
-                            
-                          }
-                        }
-                    } else {
+                  if (tweet.entities.media) {
+                    img = tweet.entities.media[0].media_url_https;
+                  }
+
+                  const req2 = new XMLHttpRequest();
+                  req2.onreadystatechange = function(event) {
+                    if (this.readyState === XMLHttpRequest.DONE) {
+                      if (this.status === 200) {
+                        let item = {
+                          title: title,
+                          link: this.responseURL,
+                          img: img,
+                          from: "Wakanim"
+                        };
+                        wakanim_list.push(item);
+                      } else {
                         console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
+                      }
                     }
-                }
-            };
 
-            req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
-            req.setRequestHeader("Authorization", "Bearer "+bearer);
-            req.send(null);
+                  }
+                  req2.open('HEAD', link, true);
+                  req2.send(null);
+
+                }
+              }
+            } else {
+              console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
+            }
           }
+        };
+
+        req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
+        req.setRequestHeader("Authorization", "Bearer " + bearer);
+        req.send(null);
       }
+    }
   }
   fileReq.open('GET', chrome.runtime.getURL("bearer.txt"), true);
   fileReq.send(null);
-  
 
-
-  // $.get("https://www.wakanim.tv/fr/v2", function(data) {
-  //   var items = new Array();
-  //   $(data).each(function(elem) {
-  //     if ($(this)[0].nodeName.toLowerCase() == "section" && $(this)[0].classList[0] == "slider-section") {
-  //       $(this)[0].childNodes.forEach(function(elem) {
-  //         if (elem.nodeName.toLowerCase() == "div" && elem.classList[0] == "container") {
-  //           var right_section = false;
-  //           elem.childNodes.forEach(function(elem2) {
-  //             if (elem2.nodeName.toLowerCase() == "header" && elem2.classList.value == "slider-section_header") {
-  //               if (elem2.children[0].nodeName.toLowerCase() == "h2" && elem2.children[0].classList.value == "slider-section_title") {
-  //                 if (elem2.children[0].textContent == "Derniers épisodes diffusés") {
-  //                   right_section = true;
-  //                 }
-  //               }
-  //             }
-  //             if (right_section && elem2.nodeName.toLowerCase() == "div" && elem2.classList.value == "slider js-slider js-slider-lastEp") {
-  //               var list_last_ep = elem2.children[0].children[0].children[0].children;
-  //               for (var i = 0; i < list_last_ep.length; i++) {
-  //                 var num_ep;
-  //                 var saison;
-  //                 var series;
-  //                 var image;
-  //                 var link;
-  //                 for (var j = 0; j < list_last_ep[i].children.length; j++) {
-  //                   if (list_last_ep[i].children[j].classList[0] == "slider_item_image") {
-  //                     num_ep = list_last_ep[i].children[j].children[1].textContent.trim();
-  //                     link = list_last_ep[i].children[j].children[1].getAttribute("href");
-  //                     image = list_last_ep[i].children[j].children[0].children[0].getAttribute("src");
-  //                   } else if (list_last_ep[i].children[j].classList[0] == "slider_item_description") {
-  //                     saison = list_last_ep[i].children[j].children[0].children[2].textContent;
-  //                     series = list_last_ep[i].children[j].children[0].children[0].textContent;
-  //                   }
-  //                 };
-  //                 var item = {
-  //                   title: series + " " + saison + " Épisode " + num_ep,
-  //                   link: "https://www.wakanim.tv" + link,
-  //                   img: "https:" + image,
-  //                   from: "Wakanim"
-  //                 };
-  //                 wakanim_list.push(item);
-  //               }
-  //               right_section = false;
-  //             }
-  //           });
-  //         }
-  //       });
-  //     }
-  //   });
-  // });
 }
 
 function set_to_watch_list_adn(item) {
