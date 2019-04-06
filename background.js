@@ -524,7 +524,7 @@ function set_wakanim_list() {
           }
         };
 
-        req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=50', true);
+        req.open('GET', 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=Wakanim&count=100', true);
         req.setRequestHeader("Authorization", "Bearer " + bearer);
         req.send(null);
       }
