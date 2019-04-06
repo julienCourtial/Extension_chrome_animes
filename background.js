@@ -418,6 +418,8 @@ function set_watching_anime_list_nautiljon() {
 
 
         });
+
+        store_watching_anime_list();
       });
     }
   }, callback)
