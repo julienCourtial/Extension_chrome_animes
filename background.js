@@ -313,7 +313,6 @@ function set_watching_anime_list_nautiljon() {
           let title = elem.children[1].children[0].text;
 
           let link = "https://www.nautiljon.com" + elem.children[1].children[0].getAttribute("href");
-          console.log(link)
 
           for (var i = 0; i < old_watching.length; i++) {
             if (old_watching[i].title == title) {
@@ -546,7 +545,9 @@ function set_to_watch_list_adn(item) {
       if (elem.title.includes("Épisode")) {
 
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
-        true_title = true_title.replace("’", "'");
+        let regex = / /g;
+        titles = titles.replace(regex, "");
+        true_title = true_title.replace("’", "'").replace(regex, "");
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
         if (titles.includes(true_title)) {
           if (item.last_ep_notify < num_ep) {
@@ -576,7 +577,10 @@ function set_to_watch_list_crunchyroll(item) {
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      if (titles.includes(elem.seriesTitle.toLowerCase()) && !elem.title.toLowerCase().includes("dub")) {
+      let regex = / /g;
+      let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
+      titles = titles.replace(regex, "");
+      if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
         if (item.last_ep_notify < num_ep) {
           item.last_ep_notify = num_ep;
           to_watch_list.push(elem);
@@ -609,8 +613,10 @@ function set_to_watch_list_wakanim(item) {
         if (true_title.includes("-"))
           true_title = true_title.split(" -")[0];
 
-        true_title = true_title.split(" Épisode ")[0].toLowerCase();
-        if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
+        let regex = / /g;
+        true_title = true_title.split(" Épisode ")[0].toLowerCase().replace(regex, "");
+        titles = titles.replace(regex, "");
+        if (titles.includes(true_title)) {
           if (item.last_ep_notify < num_ep) {
             item.last_ep_notify = num_ep;
             to_watch_list.push(elem);
