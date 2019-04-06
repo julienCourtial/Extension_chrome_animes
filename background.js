@@ -301,104 +301,100 @@ function set_watching_anime_list_nautiljon() {
         old_watching = watching_anime_list;
         watching_anime_list = [];
         var animes = [];
-        let list = $($(data).find("tbody")[0]).find("tr");
+        let list = $(data).find(".listing")[0].children;
         let size = list.length;
-        list.each(function() {
-
-          var animes = $(this).find("td");
+        // list.each(function() {
+        for (let elem of list) {
 
           var licence = null;
 
-          var already_in = false;
+          let last_ep_notify = 0;
 
-          for (var i = 0; !already_in && i < old_watching.length; i++) {
-            if (old_watching[i].title == animes[0].childNodes[0].text) {
-              already_in = true;
-              watching_anime_list.push(old_watching[i]);
-              watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
-              });
-              if (watching_anime_list.length == size) {
-                store_watching_anime_list();
-              }
+          let title = elem.children[1].children[0].text;
+
+          let link = "https://www.nautiljon.com" + elem.children[1].children[0].getAttribute("href");
+          console.log(link)
+
+          for (var i = 0; i < old_watching.length; i++) {
+            if (old_watching[i].title == title) {
+              last_ep_notify = old_watching[i].last_ep_notify;
+              break;
             }
           }
-          if (!already_in) {
-            $.get("https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"), function(data2) {
-              var info;
-              var ul_array = $(data2).find("ul");
-              for (var i = 0; i < ul_array.length; i++) {
-                if (ul_array[i].classList[0] == "mb10") {
-                  info = ul_array[i].childNodes;
+          $.get(link, function(data2) {
+            var info;
+            var ul_array = $(data2).find("ul");
+            for (var i = 0; i < ul_array.length; i++) {
+              if (ul_array[i].classList[0] == "mb10") {
+                info = ul_array[i].childNodes;
+              }
+            }
+            if (!info) {
+              console.log("Pas une bonne page nautiljon");
+              return;
+            }
+            var licencie = false;
+            var title_alt = null;
+            for (var j = 0; j < info.length; j++) {
+              var elem_li = info[j];
+
+              var section = elem_li.textContent.split(" : ");
+              var section_title = section.shift();
+              var section_content = section.join(' : ');
+
+              if (section_title === "Titre alternatif") {
+                title_alt = section_content;
+              } else if (section_title === "Licencié en France") {
+                licencie = true;
+              } else if (licencie && section_title === "Editeur") {
+                licence = section_content.split(' ')[1]
+
+                licencie = false;
+              } else if (licencie && section_title === "Editeurs") {
+
+                var table = [];
+
+                editeurs = section_content.split(" -");
+
+                for (var m = 0; m < editeurs.length; m++) {
+                  table.push(editeurs[m].split(" ")[1]);
                 }
+                licence = table.join(" - ");
+
+                licencie = false;
               }
-              if (!info) {
-                console.log("Pas une bonne page nautiljon");
-                return;
-              }
-              var licencie = false;
-              var title_alt = null;
-              for (var j = 0; j < info.length; j++) {
-                var elem_li = info[j];
+            }
 
-                var section = elem_li.textContent.split(" : ");
-                var section_title = section.shift();
-                var section_content = section.join(' : ');
+            let image = $(data2).find("#onglets_3_image");
+            if (image.length > 0) {
+              image = image[0].childNodes[0].getAttribute("src");
+            }
 
-                if (section_title === "Titre alternatif") {
-                  title_alt = section_content;
-                } else if (section_title === "Licencié en France") {
-                  licencie = true;
-                } else if (licencie && section_title === "Editeur") {
-                  licence = section_content.split(' ')[1]
-
-                  licencie = false;
-                } else if (licencie && section_title === "Editeurs") {
-
-                  var table = [];
-
-                  editeurs = section_content.split(" -");
-
-                  for (var m = 0; m < editeurs.length; m++) {
-                    table.push(editeurs[m].split(" ")[1]);
-                  }
-                  licence = table.join(" - ");
-
-                  licencie = false;
-                }
-              }
-
-              let image = $(data2).find("#onglets_3_image");
-              if (image.length > 0) {
-                image = image[0].childNodes[0].getAttribute("src");
-              }
-
-              let synopsis = $(data2).find(".description")[0].textContent;
-              if (synopsis.length > 300)
-                synopsis = synopsis.substring(0, 300) + "...";
-              var item = {
-                title: animes[0].childNodes[0].text,
-                editeur: licence,
-                title_alt: title_alt,
-                image: "https://www.nautiljon.com" + image,
-                link: "https://www.nautiljon.com" + animes[0].childNodes[0].getAttribute("href"),
-                description: synopsis,
-                last_ep_notify: 0
-              }
-              watching_anime_list.push(item);
-              watching_anime_list.sort(function(a, b) {
-                return a.title.localeCompare(b.title);
-              });
-              if (watching_anime_list.length == size) {
-                store_watching_anime_list();
-              }
-
+            let synopsis = $(data2).find(".description")[0].textContent;
+            if (synopsis.length > 300)
+              synopsis = synopsis.substring(0, 300) + "...";
+            var item = {
+              title: title,
+              editeur: licence,
+              title_alt: title_alt,
+              image: "https://www.nautiljon.com" + image,
+              link: link,
+              description: synopsis,
+              last_ep_notify: last_ep_notify
+            }
+            watching_anime_list.push(item);
+            watching_anime_list.sort(function(a, b) {
+              return a.title.localeCompare(b.title);
             });
+            if (watching_anime_list.length == size) {
+              store_watching_anime_list();
+            }
 
-          }
+          });
 
-        });
-        // });
+        }
+
+        // store_watching_anime_list();
       });
     }
   })

@@ -1,7 +1,9 @@
+var site;
+
 function removeFromList() {
   chrome.runtime.sendMessage({
     request: "episodeSeen",
-    url: location.href
+    url: site
   }, function(response) {});
   $("#imgAnimeFR")[0].src = chrome.runtime.getURL("images/check.png");
 }
@@ -20,7 +22,16 @@ function trackPlayer() {
 
 chrome.storage.sync.get(["links"], function(result) {
   if (result.links) {
-    if (result.links.includes(location.href)) {
+    let isLink = false;
+    site = location.href;
+    for (let link of result.links) {
+      if (site.includes(link)) {
+        site = link;
+        isLink = true;
+        break;
+      }
+    }
+    if (isLink) {
       var div = $(".episodeBtns")[0];
 
       var link = document.createElement("a");
