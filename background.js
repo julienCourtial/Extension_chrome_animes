@@ -394,7 +394,7 @@ function set_watching_anime_list_nautiljon() {
 
         }
 
-        // store_watching_anime_list();
+        store_watching_anime_list();
       });
     }
   })
