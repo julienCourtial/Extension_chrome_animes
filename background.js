@@ -548,9 +548,7 @@ function set_to_watch_list_adn(item) {
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
         let regex = /[^a-zA-Z0-9]/g;
         titles = titles.replace(regex, "");
-        console.log(titles);
         true_title = true_title.replace(regex, "");
-        console.log(true_title);
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
         if (titles.includes(true_title)) {
           if (item.last_ep_notify < num_ep) {
