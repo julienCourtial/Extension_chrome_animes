@@ -387,6 +387,7 @@ function set_watching_anime_list_nautiljon() {
             });
             if (watching_anime_list.length == size) {
               store_watching_anime_list();
+              set_to_watch_list();
             }
 
           });
@@ -545,9 +546,11 @@ function set_to_watch_list_adn(item) {
       if (elem.title.includes("Épisode")) {
 
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
-        let regex = / /g;
+        let regex = /[^a-zA-Z0-9]/g;
         titles = titles.replace(regex, "");
-        true_title = true_title.replace("’", "'").replace(regex, "");
+        console.log(titles);
+        true_title = true_title.replace(regex, "");
+        console.log(true_title);
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
         if (titles.includes(true_title)) {
           if (item.last_ep_notify < num_ep) {
@@ -570,14 +573,12 @@ function set_to_watch_list_adn(item) {
 function set_to_watch_list_crunchyroll(item) {
   if (crunchyroll_list) {
     var titles = item.title.toLowerCase();
-    if (titles.includes("("))
-      titles = titles.concat(" / ", titles.split(" (")[0]);
     if (item.title_alt)
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      let regex = / /g;
+      let regex = /[^a-zA-Z0-9]/g;
       let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
       titles = titles.replace(regex, "");
       if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
@@ -610,10 +611,7 @@ function set_to_watch_list_wakanim(item) {
       if (elem.title.includes("Épisode")) {
         var true_title = elem.title;
         let num_ep = parseInt(elem.title.split("Épisode ")[1]);
-        if (true_title.includes("-"))
-          true_title = true_title.split(" -")[0];
-
-        let regex = / /g;
+        let regex = /[^a-zA-Z0-9]/g;
         true_title = true_title.split(" Épisode ")[0].toLowerCase().replace(regex, "");
         titles = titles.replace(regex, "");
         if (titles.includes(true_title)) {
@@ -681,14 +679,15 @@ chrome.runtime.onInstalled.addListener(function() {
     if (chrome.runtime.lastError)
       console.log(chrome.runtime.lastError);
     else {
-      if (result.name_nautiljon)
+      if (result.name_nautiljon) {
         name_nautiljon = result.name_nautiljon;
+      }
+      if (result.links) {
+        links = result.links;
+      }
+      running = true;
+      startup();
     }
-    if (result.links) {
-      links = result.links;
-    }
-    startup();
-    running = true;
   });
   chrome.alarms.create("check_running", {
     'periodInMinutes': 1
