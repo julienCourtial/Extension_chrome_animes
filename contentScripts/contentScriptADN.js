@@ -1,4 +1,5 @@
 var site;
+
 function callback(error) {
   console.error(error);
 }
@@ -7,14 +8,14 @@ function removeFromList() {
   browser.runtime.sendMessage({
     request: "episodeSeen",
     url: site
-  }).then( function(response) {},callback);
+  }).then(function(response) {}, callback);
 
   console.log($("#logo-flag")[0].classList);
   $("#logo-flag")[0].classList.replace("icon-flag", "icon-anime-fr-check");
 }
 
 function trackPlayer() {
-  let player = $("#adn-video-js_html5_api")[0];
+  let player = document.querySelector("video");
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {
@@ -25,7 +26,7 @@ function trackPlayer() {
   }
 }
 
-browser.storage.sync.get(["links"]).then( function(result) {
+browser.storage.sync.get(["links"]).then(function(result) {
   if (result.links) {
     let isLink = false;
     site = location.href;
@@ -63,4 +64,4 @@ browser.storage.sync.get(["links"]).then( function(result) {
 
     }
   }
-},callback);
+}, callback);
