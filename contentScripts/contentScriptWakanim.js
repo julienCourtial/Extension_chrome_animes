@@ -9,7 +9,7 @@ function removeFromList() {
 }
 
 function trackPlayer() {
-  let player = $(".jw-video")[0];
+  let player = document.querySelector("video");
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {

@@ -10,7 +10,7 @@ function removeFromList() {
 }
 
 function trackPlayer() {
-  let player = $("#adn-video-js_html5_api")[0];
+  let player = document.querySelector("video");
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {
