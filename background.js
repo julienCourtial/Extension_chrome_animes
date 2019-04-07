@@ -577,7 +577,7 @@ function set_to_watch_list_adn(serie) {
 
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
         true_title = true_title.replace("’", "'");
-        let regex = / /g;
+        let regex = /[^a-zA-Z0-9]/g;
         true_title = true_title.replace(regex, "");
         titles = titles.replace(regex, "");
         let num_ep = parseInt(elem.title.split(" Épisode ")[1].split(" ")[0]);
@@ -603,14 +603,12 @@ function set_to_watch_list_adn(serie) {
 function set_to_watch_list_crunchyroll(serie) {
   if (crunchyroll_list) {
     var titles = serie.title.toLowerCase();
-    if (titles.includes("("))
-      titles = titles.concat(" / ", titles.split(" (")[0]);
     if (serie.title_alt)
       titles = titles.concat(" /", serie.title_alt.toLowerCase());
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
       let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      let regex = / /g;
+      let regex = /[^a-zA-Z0-9]/g;
       let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
       titles = titles.replace(regex, "");
       if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
@@ -634,8 +632,6 @@ function set_to_watch_list_crunchyroll(serie) {
 function set_to_watch_list_wakanim(serie) {
   if (wakanim_list) {
     var titles = serie.title.toLowerCase();
-    if (titles.includes("("))
-      titles = titles.concat(" / ", titles.split(" (")[0]);
     if (serie.title_alt)
       titles = titles.concat(" /", serie.title_alt.toLowerCase());
 
@@ -644,10 +640,8 @@ function set_to_watch_list_wakanim(serie) {
       if (elem.title.includes("Épisode")) {
         var true_title = elem.title;
         let num_ep = parseInt(elem.title.split("Épisode ")[1]);
-        if (true_title.includes("-"))
-          true_title = true_title.split(" -")[0];
 
-        let regex = / /g;
+        let regex = /[^a-zA-Z0-9]/g;
         true_title = true_title.split(" Épisode ")[0].toLowerCase().replace(regex, "");
         titles = titles.replace(regex, "");
         if (titles.includes(true_title.split(" Épisode ")[0].toLowerCase())) {
