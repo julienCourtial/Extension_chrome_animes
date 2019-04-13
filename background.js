@@ -544,7 +544,6 @@ function set_to_watch_list_adn(item) {
     for (var i = adn_list.length - 1; i >= 0; i--) {
       let elem = adn_list[i];
       if (elem.title.includes("Épisode")) {
-
         var true_title = elem.title.split(" Épisode")[0].toLowerCase();
         let regex = /[^a-zA-Z0-9]/g;
         titles = titles.replace(regex, "");
@@ -575,21 +574,24 @@ function set_to_watch_list_crunchyroll(item) {
       titles = titles.concat(" /", item.title_alt.toLowerCase());
     for (var i = crunchyroll_list.length - 1; i >= 0; i--) {
       let elem = crunchyroll_list[i];
-      let num_ep = parseInt(elem.title.split(" - ")[1].split(" ")[1]);
-      let regex = /[^a-zA-Z0-9]/g;
-      let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
-      titles = titles.replace(regex, "");
-      if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
-        if (item.last_ep_notify < num_ep) {
-          item.last_ep_notify = num_ep;
-          to_watch_list.push(elem);
-          createNotif(elem);
-          store_to_watch_list();
-          store_watching_anime_list();
-          links.push(elem.link);
-          chrome.storage.sync.set({
-            "links": links
-          });
+      let num_ep = null;
+      if (elem.title.includes("Épisode")) {
+        num_ep = parseInt(elem.title.split("Épisode ")[1].split(" -")[0]);
+        let regex = /[^a-zA-Z0-9]/g;
+        let true_title = elem.seriesTitle.toLowerCase().replace(regex, "");
+        titles = titles.replace(regex, "");
+        if (titles.includes(true_title) && !elem.title.toLowerCase().includes("dub")) {
+          if (item.last_ep_notify < num_ep) {
+            item.last_ep_notify = num_ep;
+            to_watch_list.push(elem);
+            createNotif(elem);
+            store_to_watch_list();
+            store_watching_anime_list();
+            links.push(elem.link);
+            chrome.storage.sync.set({
+              "links": links
+            });
+          }
         }
       }
     }
