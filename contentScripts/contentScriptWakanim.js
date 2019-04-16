@@ -13,7 +13,9 @@ function trackPlayer() {
   if (player == undefined) {
     setTimeout(trackPlayer, 10000);
   } else {
-    $(".episodeNextEp")[0].onclick = removeFromList;
+    if (document.querySelector(".episodeNextEp")) {
+      document.querySelector(".episodeNextEp").onclick = removeFromList;
+    }
     player.addEventListener('ended', function(event) {
       removeFromList();
     });
