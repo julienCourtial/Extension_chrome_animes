@@ -2,9 +2,26 @@
   "name": "Anime Notifier FR",
   "version": "1.4.5",
   "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
-  "permissions": ["management","downloads","notifications","tabs","activeTab","declarativeContent","storage","alarms","https://animedigitalnetwork.fr/","https://www.nautiljon.com/","https://www.crunchyroll.com/","https://www.wakanim.tv/","https://api.twitter.com/","https://goo.gl/","https://bit.ly/","http://bit.ly/"],
+  "permissions": [
+    "management",
+    "downloads",
+    "notifications",
+    "tabs",
+    "activeTab",
+    "declarativeContent",
+    "storage",
+    "alarms",
+    "https://animedigitalnetwork.fr/",
+    "https://www.nautiljon.com/",
+    "https://www.crunchyroll.com/",
+    "https://www.wakanim.tv/",
+    "https://api.twitter.com/",
+    "https://goo.gl/",
+    "https://bit.ly/",
+    "http://bit.ly/"
+  ],
   "background": {
-    "scripts": ["useful/jquery-3.4.0.min.js","useful/sizeof.js", "background.js"],
+    "scripts": ["useful/sizeof.js", "background.js"],
     "persistent": true
   },
   "browser_action": {
@@ -23,25 +40,22 @@
     "128": "images/logo_null128.png"
   },
   "content_scripts": [
-   {
-     "matches": ["https://animedigitalnetwork.fr/*"],
-     "css": ["contentScripts/ADNStyle.css"],
-     "js": ["useful/jquery-3.4.0.min.js","contentScripts/contentScriptADN.js"]
-   },
-   {
-     "matches": ["https://www.crunchyroll.com/*"],
-     "css": ["contentScripts/CrunchyrollStyle.css"],
-     "js": ["useful/jquery-3.4.0.min.js","contentScripts/contentScriptCrunchyroll.js"]
-   },
-   {
-     "matches": ["https://www.wakanim.tv/*"],
-     "css": ["contentScripts/WakanimStyle.css"],
-     "js": ["useful/jquery-3.4.0.min.js","contentScripts/contentScriptWakanim.js"]
-   }
- ],
- "web_accessible_resources": [
-    "images/*",
-    "bearer"
+    {
+      "matches": ["https://animedigitalnetwork.fr/*"],
+      "css": ["contentScripts/ADNStyle.css"],
+      "js": ["contentScripts/contentScriptADN.js"]
+    },
+    {
+      "matches": ["https://www.crunchyroll.com/*"],
+      "css": ["contentScripts/CrunchyrollStyle.css"],
+      "js": ["contentScripts/contentScriptCrunchyroll.js"]
+    },
+    {
+      "matches": ["https://www.wakanim.tv/*"],
+      "css": ["contentScripts/WakanimStyle.css"],
+      "js": ["contentScripts/contentScriptWakanim.js"]
+    }
   ],
+  "web_accessible_resources": ["images/*", "bearer"],
   "manifest_version": 2
 }
