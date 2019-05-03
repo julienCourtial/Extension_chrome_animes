@@ -11,202 +11,43 @@ $(document).ready(function() {
   $(".fixed-action-btn").floatingActionButton();
 });
 
-function store_to_watch_list(to_watch_list) {
-  console.log("storing to watch list");
-  let nb = sizeof(to_watch_list) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
-  if (nb > 3) {
-    let div = Math.floor(to_watch_list.length / 4);
-    if (4 * div < to_watch_list.length) {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 5,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div),
-          to_watch_list3: to_watch_list.slice(2 * div, 3 * div),
-          to_watch_list4: to_watch_list.slice(3 * div, 4 * div),
-          to_watch_list5: to_watch_list.slice(4 * div, to_watch_list.length)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    } else {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 4,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div),
-          to_watch_list3: to_watch_list.slice(2 * div, 3 * div),
-          to_watch_list4: to_watch_list.slice(3 * div, 4 * div)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    }
-  } else if (nb > 2) {
-    let div = Math.floor(to_watch_list.length / 3);
-    if (3 * div < to_watch_list.length) {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 4,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div),
-          to_watch_list3: to_watch_list.slice(2 * div, 3 * div),
-          to_watch_list4: to_watch_list.slice(3 * div, to_watch_list.length)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    } else {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 3,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div),
-          to_watch_list3: to_watch_list.slice(2 * div, 3 * div)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    }
-  } else if (nb > 1) {
-    let div = Math.floor(to_watch_list.length / 2);
-    if (2 * div < to_watch_list.length) {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 3,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div),
-          to_watch_list3: to_watch_list.slice(2 * div, to_watch_list.length)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    } else {
-      chrome.storage.sync.set(
-        {
-          nb_to_watch_list: 2,
-          to_watch_list1: to_watch_list.slice(0, div),
-          to_watch_list2: to_watch_list.slice(div, 2 * div)
-        },
-        function() {
-          if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
-          } else {
-            chrome.browserAction.setBadgeText({
-              text: to_watch_list.length.toString()
-            });
-            chrome.browserAction.setBadgeBackgroundColor({
-              color: "#4688F1"
-            });
-          }
-        }
-      );
-    }
-  } else {
-    chrome.storage.sync.set(
-      {
-        nb_to_watch_list: 1,
-        to_watch_list1: to_watch_list
-      },
-      function() {
-        if (chrome.runtime.lastError) {
-          console.log(chrome.runtime.lastError);
-        } else {
-          chrome.browserAction.setBadgeText({
-            text: to_watch_list.length.toString()
-          });
-          chrome.browserAction.setBadgeBackgroundColor({
-            color: "#4688F1"
-          });
-        }
-      }
-    );
-  }
-}
-
-function display_to_watch_list() {
+function displayToWatchList() {
   var card = document.querySelector("#card_anime");
-  var list_episode = $("#list_episode");
-  var to_watch_list = [];
+  var listEpisode = document.querySelector("#listEpisode");
+  var toWatchList = [];
   chrome.storage.sync.get(
-    ["nb_to_watch_list", "to_watch_list1", "to_watch_list2", "to_watch_list3", "to_watch_list4", "to_watch_list5"],
+    ["nbToWatchList", "toWatchList1", "toWatchList2", "toWatchList3", "toWatchList4", "toWatchList5"],
     function(result) {
-      if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-      else {
-        if (result.nb_to_watch_list >= 1) {
-          to_watch_list = to_watch_list.concat(result.to_watch_list1);
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError);
+      } else {
+        if (result.nbToWatchList >= 1) {
+          toWatchList = toWatchList.concat(result.toWatchList1);
         }
-        if (result.nb_to_watch_list >= 2) {
-          to_watch_list = to_watch_list.concat(result.to_watch_list2);
+        if (result.nbToWatchList >= 2) {
+          toWatchList = toWatchList.concat(result.toWatchList2);
         }
-        if (result.nb_to_watch_list >= 3) {
-          to_watch_list = to_watch_list.concat(result.to_watch_list3);
+        if (result.nbToWatchList >= 3) {
+          toWatchList = toWatchList.concat(result.toWatchList3);
         }
-        if (result.nb_to_watch_list >= 4) {
-          to_watch_list = to_watch_list.concat(result.to_watch_list4);
+        if (result.nbToWatchList >= 4) {
+          toWatchList = toWatchList.concat(result.toWatchList4);
         }
-        if (result.nb_to_watch_list >= 5) {
-          to_watch_list = to_watch_list.concat(result.to_watch_list5);
+        if (result.nbToWatchList >= 5) {
+          toWatchList = toWatchList.concat(result.toWatchList5);
         }
 
-        to_watch_list.reverse();
-        to_watch_list.forEach(function(elem) {
-          var clone = document.importNode(card.content, true);
-          var img = clone.querySelector("img");
-          if (elem.img) img.setAttribute("src", elem.img);
-          var description = clone.querySelector(".description");
+        toWatchList.reverse();
+
+        for (let elem of toWatchList) {
+          let clone = document.importNode(card.content, true);
+          let img = clone.querySelector("img");
+          if (elem.img) {
+            img.setAttribute("src", elem.img);
+          }
+          let description = clone.querySelector(".description");
           description.textContent = elem.title;
-          var remove = clone.querySelector("#remove");
+          let remove = clone.querySelector("#remove");
           remove.onclick = function(event) {
             event.preventDefault();
             chrome.runtime.sendMessage(
@@ -215,75 +56,79 @@ function display_to_watch_list() {
                 url: elem.link
               },
               function(response) {
-                if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-                else {
+                if (chrome.runtime.lastError) {
+                  console.log(chrome.runtime.lastError);
+                } else {
                   console.log(response);
                 }
               }
             );
           };
 
-          var watch = clone.querySelector("#watch");
+          let watch = clone.querySelector("#watch");
           watch.onclick = function() {
             chrome.tabs.create({
               url: elem.link
             });
           };
 
-          list_episode.append(clone);
-        });
+          listEpisode.append(clone);
+        }
       }
     }
   );
 }
 
-function display_watching_list() {
-  let card = document.querySelector("#card_watching");
-  var div = $("#watching_list");
+function displayWatchingList() {
+  let card = document.querySelector("#cardWatching");
+  let div = document.querySelector("#watchingList");
 
   chrome.storage.sync.get(
     [
-      "nb_watching_anime_list",
-      "watching_anime_list1",
-      "watching_anime_list2",
-      "watching_anime_list3",
-      "watching_anime_list4",
-      "watching_anime_list5"
+      "nbWatchingAnimeList",
+      "watchingAnimeList1",
+      "watchingAnimeList2",
+      "watchingAnimeList3",
+      "watchingAnimeList4",
+      "watchingAnimeList5"
     ],
     function(result) {
-      if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-      else {
-        let watching_anime_list = [];
-        if (result.nb_watching_anime_list >= 1 && result.watching_anime_list1) {
-          watching_anime_list = watching_anime_list.concat(result.watching_anime_list1);
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError);
+      } else {
+        let watchingAnimeList = [];
+        if (result.nbWatchingAnimeList >= 1 && result.watchingAnimeList1) {
+          watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList1);
         }
-        if (result.nb_watching_anime_list >= 2 && result.watching_anime_list2) {
-          watching_anime_list = watching_anime_list.concat(result.watching_anime_list2);
+        if (result.nbWatchingAnimeList >= 2 && result.watchingAnimeList2) {
+          watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList2);
         }
-        if (result.nb_watching_anime_list >= 3 && result.watching_anime_list3) {
-          watching_anime_list = watching_anime_list.concat(result.watching_anime_list3);
+        if (result.nbWatchingAnimeList >= 3 && result.watchingAnimeList3) {
+          watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList3);
         }
-        if (result.nb_watching_anime_list >= 4 && result.watching_anime_list4) {
-          watching_anime_list = watching_anime_list.concat(result.watching_anime_list4);
+        if (result.nbWatchingAnimeList >= 4 && result.watchingAnimeList4) {
+          watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList4);
         }
-        if (result.nb_watching_anime_list >= 5 && result.watching_anime_list5) {
-          watching_anime_list = watching_anime_list.concat(result.watching_anime_list5);
+        if (result.nbWatchingAnimeList >= 5 && result.watchingAnimeList5) {
+          watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList5);
         }
-        if (watching_anime_list.length == 0) {
+        if (watchingAnimeList.length == 0) {
           div[0].textContent = "Vous n'avez aucune série dans votre liste nautiljon";
         } else {
-          watching_anime_list.forEach(function(elem) {
-            var clone = document.importNode(card.content, true);
-            var img = clone.querySelector("img");
-            if (elem.image) img.setAttribute("src", elem.image);
-            var title = clone.querySelector(".card-title");
+          watchingAnimeList.forEach(function(elem) {
+            let clone = document.importNode(card.content, true);
+            let img = clone.querySelector("img");
+            if (elem.image) {
+              img.setAttribute("src", elem.image);
+            }
+            let title = clone.querySelector(".card-title");
             title.textContent = elem.title;
-            var last_ep = clone.querySelector("#last_ep");
-            last_ep.textContent = "Dernier épisode sorti : " + elem.last_ep_notify;
-            var description = clone.querySelector("#description");
+            let lastEp = clone.querySelector("#lastEp");
+            lastEp.textContent = "Dernier épisode sorti : " + elem.lastEpNotify;
+            let description = clone.querySelector("#description");
             description.textContent = elem.description;
 
-            var more = clone.querySelector("#more");
+            let more = clone.querySelector("#more");
             more.onclick = function() {
               chrome.tabs.create({
                 url: elem.link
@@ -293,65 +138,68 @@ function display_watching_list() {
             div.append(clone);
           });
         }
-        $("#refresh")[0].style.visibility = "visible";
-        $("#refresh")[0].onclick = function() {
+        document.querySelector("#refresh").style.visibility = "visible";
+        document.querySelector("#refresh").onclick = function() {
           chrome.runtime.sendMessage(
             {
               request: "refreshWatching"
             },
             function(response) {
-              if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-              else {
+              if (chrome.runtime.lastError) {
+                console.log(chrome.runtime.lastError);
+              } else {
                 console.log(response);
               }
             }
           );
         };
-        $("#change_pseudo")[0].style.visibility = "visible";
-        $("#change_pseudo")[0].onclick = function() {
-          // chrome.storage.sync.remove("name_nautiljon");
-          $("#watching_list")[0].textContent = "";
-          display_form_nautiljon();
+        document.querySelector("#changePseudo").style.visibility = "visible";
+        document.querySelector("#changePseudo").onclick = function() {
+          // chrome.storage.sync.remove("nameNautiljon");
+          document.querySelector("#watchingList").textContent = "";
+          displayFormNautiljon();
         };
       }
     }
   );
 }
 
-function display_form_nautiljon() {
-  var card = document.querySelector("#form_nautiljon");
-  var div = $("#watching_list");
+function displayFormNautiljon() {
+  let card = document.querySelector("#formNautiljon");
+  let div = document.querySelector("#watchingList");
   div.append(document.importNode(card.content, true));
-  $("#refresh")[0].style.visibility = "hidden";
-  $("#change_pseudo")[0].style.visibility = "hidden";
-  $("#start_button")[0].onclick = function() {
+  document.querySelector("#refresh").style.visibility = "hidden";
+  document.querySelector("#changePseudo").style.visibility = "hidden";
+  document.querySelector("#startButton").onclick = function() {
     chrome.runtime.sendMessage(
       {
         request: "settingNautiljon",
-        pseudo: $("#pseudo")[0].value
+        pseudo: document.querySelector("#pseudo").value
       },
       function(response) {
-        if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-        else {
+        if (chrome.runtime.lastError) {
+          console.log(chrome.runtime.lastError);
+        } else {
           console.log(response);
         }
       }
     );
   };
-  $("#cancelButton")[0].onclick = function() {
-    $("#watching_list")[0].textContent = "";
-    display_watching_list();
+  document.querySelector("#cancelButton").onclick = function() {
+    document.querySelector("#watchingList").textContent = "";
+    displayWatchingList();
   };
   document.onkeyup = function(event) {
-    if (event.keyCode == 13 && event.target == $("#pseudo")[0]) {
+    if (event.keyCode == 13 && event.target == document.querySelector("#pseudo")) {
       chrome.runtime.sendMessage(
         {
           request: "settingNautiljon",
-          pseudo: $("#pseudo")[0].value
+          pseudo: document.querySelector("#pseudo").value
         },
         function(response) {
-          if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-          else {
+          if (chrome.runtime.lastError) {
+            console.log(chrome.runtime.lastError);
+          } else {
             console.log(response);
           }
         }
@@ -360,43 +208,43 @@ function display_form_nautiljon() {
   };
 }
 
-chrome.storage.sync.get(["name_nautiljon"], function(result) {
-  if (result.name_nautiljon) {
-    display_to_watch_list();
-    display_watching_list();
+chrome.storage.sync.get(["nameNautiljon"], function(result) {
+  if (result.nameNautiljon) {
+    displayToWatchList();
+    displayWatchingList();
   } else {
-    $("#list_episode")[0].textContent = "";
-    let init = document.querySelector("#start_to_watch");
+    document.querySelector("#listEpisode").textContent = "";
+    let init = document.querySelector("#startToWatch");
     let toAdd = document.importNode(init.content, true);
-    $("#list_episode").append(toAdd);
-    display_form_nautiljon();
+    document.querySelector("#listEpisode").append(toAdd);
+    displayFormNautiljon();
   }
 });
 
 chrome.storage.onChanged.addListener(function(changes, areaName) {
   if (
-    changes.nb_to_watch_list ||
-    changes.to_watch_list1 ||
-    changes.to_watch_list2 ||
-    changes.to_watch_list3 ||
-    changes.to_watch_list4 ||
-    changes.to_watch_list5
+    changes.nbToWatchList ||
+    changes.toWatchList1 ||
+    changes.toWatchList2 ||
+    changes.toWatchList3 ||
+    changes.toWatchList4 ||
+    changes.toWatchList5
   ) {
-    $("#list_episode")[0].textContent = "";
-    display_to_watch_list();
+    document.querySelector("#listEpisode").textContent = "";
+    displayToWatchList();
   } else if (
-    changes.nb_watching_anime_list ||
-    changes.watching_anime_list1 ||
-    changes.watching_anime_list2 ||
-    changes.watching_anime_list3 ||
-    changes.watching_anime_list4 ||
-    changes.watching_anime_list5
+    changes.nbWatchingAnimeList ||
+    changes.watchingAnimeList1 ||
+    changes.watchingAnimeList2 ||
+    changes.watchingAnimeList3 ||
+    changes.watchingAnimeList4 ||
+    changes.watchingAnimeList5
   ) {
-    $("#watching_list")[0].textContent = "";
-    display_watching_list();
+    document.querySelector("#watchingList").textContent = "";
+    displayWatchingList();
   } else if (changes.nameNautiljon) {
-    $("#watching_list")[0].textContent = "";
-    display_watching_list();
+    document.querySelector("#watchingList").textContent = "";
+    displayWatchingList();
   }
   // window.location.reload();
 });
