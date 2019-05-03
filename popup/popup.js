@@ -246,5 +246,4 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
     document.querySelector("#watchingList").textContent = "";
     displayWatchingList();
   }
-  // window.location.reload();
 });

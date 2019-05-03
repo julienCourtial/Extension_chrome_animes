@@ -24,9 +24,6 @@ let notificationLinksAndId = [];
 // List of url of each episode in toWatchList
 let links = [];
 
-//
-let running;
-
 // Standard callback function
 function callback() {
   if (chrome.runtime.lastError) {
@@ -470,8 +467,7 @@ function setToWatchListWakanim(item) {
 //  editor of the anime
 function setToWatchList() {
   if (watchingAnimeList) {
-    for (var i = 0; i < watchingAnimeList.length; i++) {
-      var elem = watchingAnimeList[i];
+    for (let elem of watchingAnimeList) {
       if (elem.editeurs != null) {
         let editeurs = elem.editeurs;
         if (editeurs.includes("ADN") || editeurs.includes("Kana")) {
@@ -508,13 +504,13 @@ function setWatchingAnimeListNautiljon() {
             for (let elem of list) {
               let lastEpNotify = 0;
 
-              let title = elem.children[1].children[0].text;
+              let title = elem.getElementsByClassName("t_titre")[0].textContent;
 
-              let link = "https://www.nautiljon.com" + elem.children[1].children[0].getAttribute("href");
+              let link = "https://www.nautiljon.com" + elem.getElementsByClassName("tooltip")[0].getAttribute("href");
 
-              for (var i = 0; i < oldWatching.length; i++) {
-                if (oldWatching[i].title == title) {
-                  lastEpNotify = oldWatching[i].lastEpNotify;
+              for (let lastEp of oldWatching) {
+                if (lastEp.title == title) {
+                  lastEpNotify = lastEp.lastEpNotify;
                   break;
                 }
               }
@@ -599,7 +595,7 @@ function setWatchingAnimeListNautiljon() {
                     });
                     if (watchingAnimeList.length == size) {
                       storeWatchingAnimeList();
-                      // setToWatchList();
+                      setToWatchList();
                     }
                   } else {
                     console.log("Status de la réponse: %d (%s)", this.status, this.statusText);
@@ -782,67 +778,43 @@ function startup() {
   setTimeout(setToWatchList, 60000);
   setTimeout(startup, 70000);
 }
+
 chrome.runtime.onInstalled.addListener(function() {
-  console.log("OnInstalled"); // chrome.storage.sync.clear();
+  console.log("OnInstalled");
   retrieveWatchingAnimeList();
   retrieveToWatchList();
   chrome.storage.sync.get(["nameNautiljon", "links"], function(result) {
-    if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-    else {
+    if (chrome.runtime.lastError) {
+      console.log(chrome.runtime.lastError);
+    } else {
       if (result.nameNautiljon) {
         nameNautiljon = result.nameNautiljon;
       }
       if (result.links) {
         links = result.links;
       }
-      running = true;
       startup();
     }
   });
-  chrome.alarms.create("checkRunning", {
-    periodInMinutes: 1
-  });
 }); //also get the last dates pls
+
 chrome.runtime.onStartup.addListener(function() {
   console.log("OnStartup");
   retrieveWatchingAnimeList();
   retrieveToWatchList();
   chrome.storage.sync.get(["nameNautiljon", "links"], function(result) {
-    if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-    else {
+    if (chrome.runtime.lastError) {
+      console.log(chrome.runtime.lastError);
+    } else {
       if (result.nameNautiljon) {
         nameNautiljon = result.nameNautiljon;
       }
-
       if (result.links) {
         links = result.links;
       }
-      running = true;
       startup();
     }
   });
-});
-//ADD GET TO EVERY LIST TO SET THEM IN LOCAL AND SET THE LIST IN SYNC WHEN CREATED
-chrome.alarms.onAlarm.addListener(function(alarm) {
-  if (alarm.name == "checkRunning") {
-    if (!running) {
-      retrieveWatchingAnimeList();
-      retrieveToWatchList();
-      chrome.storage.sync.get(["nameNautiljon", "links"], function(result) {
-        if (chrome.runtime.lastError) console.log(chrome.runtime.lastError);
-        else {
-          if (result.nameNautiljon) {
-            nameNautiljon = result.nameNautiljon;
-          }
-          if (result.links) {
-            links = result.links;
-          }
-          running = true;
-          startup();
-        }
-      });
-    }
-  }
 });
 
 chrome.notifications.onClicked.addListener(function(notificationId) {
@@ -854,6 +826,7 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     }
   });
 });
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.request == "refreshWatching") {
     setWatchingAnimeListNautiljon();
