@@ -12,7 +12,7 @@ $(document).ready(function() {
 });
 
 function displayToWatchList() {
-  var card = document.querySelector("#card_anime");
+  var card = document.querySelector("#cardAnime");
   var listEpisode = document.querySelector("#listEpisode");
   var toWatchList = [];
   chrome.storage.sync.get(
@@ -113,7 +113,7 @@ function displayWatchingList() {
           watchingAnimeList = watchingAnimeList.concat(result.watchingAnimeList5);
         }
         if (watchingAnimeList.length == 0) {
-          div[0].textContent = "Vous n'avez aucune série dans votre liste nautiljon";
+          div.textContent = "Vous n'avez aucune série dans votre liste nautiljon";
         } else {
           watchingAnimeList.forEach(function(elem) {
             let clone = document.importNode(card.content, true);

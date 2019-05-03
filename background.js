@@ -103,7 +103,6 @@ function createNotif(elem) {
 // Store the watching_anime list by dividing it depending on the list size and
 // the QUOTA BYTES PER ITEM from browser storage
 function storeWatchingAnimeList() {
-  console.log("storing watching list");
   let nbToDivide = sizeof(watchingAnimeList) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nbToDivide > 3) {
     let div = Math.floor(watchingAnimeList.length / 4);
@@ -227,7 +226,6 @@ function retrieveWatchingAnimeList() {
 // Store the to_watch list by dividing it depending on the list size and
 // the QUOTA BYTES PER ITEM from browser storage
 function storeToWatchList() {
-  console.log("storing to watch list");
   let nbToDivide = sizeof(toWatchList) / chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
   if (nbToDivide > 3) {
     let div = Math.floor(toWatchList.length / 4);
@@ -778,13 +776,10 @@ function setWakanimList() {
 }
 
 function startup() {
-  // setWatchingAnimeListNautiljon();
   setAdnList();
   setCrunchyrollList();
   setWakanimList();
   setTimeout(setToWatchList, 60000);
-  // setTimeout(refresh, 300000);
-  // setTimeout(startup, 30000);
   setTimeout(startup, 70000);
 }
 chrome.runtime.onInstalled.addListener(function() {

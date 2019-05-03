@@ -1,6 +1,6 @@
 {
   "name": "Anime Notifier FR",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Soyez notifié quand un épisode de vos séries animés favorites sort",
   "permissions": [
     "management",
